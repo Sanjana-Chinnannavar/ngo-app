@@ -5,11 +5,13 @@ const authRoutes = require("./routes/authRoutes");
 const app = express();
 const volunteerRoutes = require("./routes/volunteerRoutes");
 const errorMiddleware = require("./middleware/errorMiddleware");
+const eventRoutes = require("./routes/eventRoutes");
 
 app.use(express.json());
 app.use(cors());
 app.use("/volunteers", volunteerRoutes);
 app.use(errorMiddleware);
+app.use("/events", eventRoutes);
 
 
 // test route
