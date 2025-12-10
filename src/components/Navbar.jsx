@@ -1,28 +1,21 @@
 import { Link } from "react-router-dom";
+//import "./Navbar.css"; // optional if you want to style later
 
-const Navbar = () => {
+export default function Navbar() {
   return (
-    <nav style={{ padding: "10px", background: "#333", color: "white" }}>
-      <Link to="/admin" style={{ marginRight: "15px", color: "white" }}>
-        Admin
-      </Link>
-      <Link to="/volunteer" style={{ marginRight: "15px", color: "white" }}>
-        Volunteer
-      </Link>
-      <Link to="/volunteers" style={{ marginRight: "15px", color: "white" }}>
-        Volunteers
-      </Link>
-      <Link to="/events" style={{ marginRight: "15px", color: "white" }}>
-        Events
-      </Link>
-      <Link to="/announcements" style={{ marginRight: "15px", color: "white" }}>
-        Announcements
-      </Link>
-      <Link to="/calendar" style={{ color: "white" }}>
-        Calendar
-      </Link>
+    <nav className="navbar">
+      <div className="nav-left">
+        <h2>NGO Volunteer System</h2>
+      </div>
+
+      <div className="nav-right">
+        <Link to="/admin">Admin Dashboard</Link>
+        <Link to="/volunteer">Volunteer Dashboard</Link>
+        <Link to="/volunteers">Volunteers</Link>
+        <Link to="/events">Events</Link>
+        <Link to="/announcements">Announcements</Link>
+        <Link to="/calendar">Calendar</Link>
+      </div>
     </nav>
   );
-};
-
-export default Navbar;
+}
