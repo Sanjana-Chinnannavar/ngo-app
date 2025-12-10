@@ -1,76 +1,43 @@
 const AdminDashboard = () => {
-  const mockStats = {
-    volunteers: 24,
-    events: 6,
-    announcements: 3,
-  };
+  const stats = [
+    { label: "Total Volunteers", value: 24 },
+    { label: "Total Events", value: 6 },
+    { label: "Announcements", value: 3 },
+  ];
 
   const upcomingEvents = [
     { title: "Tree Plantation", date: "Jan 20, 2025" },
-    { title: "Food Drive", date: "Jan 26, 2025" },
+    { title: "Food Donation Camp", date: "Jan 26, 2025" },
   ];
 
   return (
-    <div style={styles.container}>
-      <h1 style={styles.header}>Admin Dashboard</h1>
+    <div className="p-8 max-w-5xl mx-auto">
+      <h1 className="text-3xl font-semibold mb-6">Admin Dashboard</h1>
 
-      {/* Stats section */}
-      <div style={styles.statsGrid}>
-        <div style={styles.card}>
-          <h3>{mockStats.volunteers}</h3>
-          <p>Total Volunteers</p>
+      <div className="bg-white p-6 rounded-xl shadow-md">
+        {/* Stats Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          {stats.map((s, i) => (
+            <div key={i} className="bg-blue-600 text-white p-6 rounded-xl shadow flex flex-col items-center">
+              <div className="text-4xl font-bold">{s.value}</div>
+              <div className="opacity-90 mt-2">{s.label}</div>
+            </div>
+          ))}
         </div>
 
-        <div style={styles.card}>
-          <h3>{mockStats.events}</h3>
-          <p>Total Events</p>
-        </div>
-
-        <div style={styles.card}>
-          <h3>{mockStats.announcements}</h3>
-          <p>Announcements</p>
+        {/* Upcoming Events */}
+        <h2 className="text-xl font-semibold mb-3">Upcoming Events</h2>
+        <div className="space-y-4">
+          {upcomingEvents.map((event, i) => (
+            <div key={i} className="bg-gray-50 p-5 rounded-xl border shadow-sm">
+              <h3 className="font-semibold">{event.title}</h3>
+              <p className="text-gray-700 mt-1">📅 {event.date}</p>
+            </div>
+          ))}
         </div>
       </div>
-
-      {/* Upcoming events */}
-      <h2 style={{ marginTop: "30px" }}>Upcoming Events</h2>
-      <ul style={styles.list}>
-        {upcomingEvents.map((event, i) => (
-          <li key={i} style={styles.listItem}>
-            <b>{event.title}</b> — {event.date}
-          </li>
-        ))}
-      </ul>
     </div>
   );
-};
-
-// Basic styling
-const styles = {
-  container: {
-    padding: "30px",
-  },
-  header: {
-    marginBottom: "20px",
-  },
-  statsGrid: {
-    display: "flex",
-    gap: "20px",
-  },
-  card: {
-    flex: 1,
-    padding: "20px",
-    background: "white",
-    borderRadius: "8px",
-    boxShadow: "0 0 5px rgba(0,0,0,0.1)",
-    textAlign: "center",
-  },
-  list: {
-    paddingLeft: "20px",
-  },
-  listItem: {
-    marginBottom: "10px",
-  },
 };
 
 export default AdminDashboard;

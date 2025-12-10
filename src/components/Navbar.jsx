@@ -2,60 +2,19 @@ import { Link } from "react-router-dom";
 
 const Navbar = () => {
   return (
-    <nav style={styles.navbar}>
-      {/* Left Section */}
-      <div style={styles.left}>
-        <h2 style={styles.logo}>NGO Portal</h2>
-      </div>
+    <nav className="bg-gray-900 text-white px-6 py-4 shadow-md flex justify-between items-center">
+      <h2 className="text-xl font-semibold tracking-wide">NGO Portal</h2>
 
-      {/* Right Section (Links) */}
-      <div style={styles.right}>
-        <Link to="/admin" style={styles.link}>Admin Dashboard</Link>
-        <Link to="/volunteer" style={styles.link}>Volunteer Dashboard</Link>
-        <Link to="/volunteers" style={styles.link}>Volunteers</Link>
-        <Link to="/events" style={styles.link}>Events</Link>
-        <Link to="/announcements" style={styles.link}>Announcements</Link>
-        <Link to="/calendar" style={styles.link}>Calendar</Link>
+      <div className="flex gap-6 text-sm font-medium">
+        <Link className="hover:text-gray-300" to="/admin">Admin</Link>
+        <Link className="hover:text-gray-300" to="/volunteer">Volunteer</Link>
+        <Link className="hover:text-gray-300" to="/volunteers">Volunteers</Link>
+        <Link className="hover:text-gray-300" to="/events">Events</Link>
+        <Link className="hover:text-gray-300" to="/announcements">Announcements</Link>
+        <Link className="hover:text-gray-300" to="/calendar">Calendar</Link>
       </div>
     </nav>
   );
-};
-
-const styles = {
-  navbar: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    padding: "15px 25px",
-    background: "#1a1a1a",
-    color: "white",
-    boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
-    marginBottom: "20px",
-  },
-  logo: {
-    margin: 0,
-    fontSize: "22px",
-    fontWeight: "600",
-  },
-  left: {
-    display: "flex",
-    alignItems: "center",
-  },
-  right: {
-    display: "flex",
-    gap: "20px",
-    alignItems: "center",
-  },
-  link: {
-    color: "white",
-    textDecoration: "none",
-    fontSize: "15px",
-    opacity: 0.85,
-    transition: "0.2s",
-  },
-  linkHover: {
-    opacity: 1,
-  },
 };
 
 export default Navbar;

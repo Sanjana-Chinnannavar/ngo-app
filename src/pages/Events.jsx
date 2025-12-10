@@ -1,80 +1,35 @@
 const Events = () => {
   const mockEvents = [
-    {
-      title: "Tree Plantation Drive",
-      date: "Jan 20, 2025",
-      volunteersNeeded: 10,
-    },
-    {
-      title: "Food Donation Camp",
-      date: "Jan 26, 2025",
-      volunteersNeeded: 5,
-    },
-    {
-      title: "Clothes Distribution",
-      date: "Feb 2, 2025",
-      volunteersNeeded: 8,
-    },
+    { title: "Tree Plantation Drive", date: "Jan 20, 2025", volunteersNeeded: 10 },
+    { title: "Food Donation Camp", date: "Jan 26, 2025", volunteersNeeded: 5 },
+    { title: "Clothes Distribution", date: "Feb 2, 2025", volunteersNeeded: 8 },
   ];
 
   return (
-    <div style={styles.container}>
-      <h1 style={styles.header}>Events</h1>
+    <div className="p-8 max-w-5xl mx-auto">
+      <h1 className="text-3xl font-semibold mb-6">Events</h1>
 
-      <button style={styles.createButton}>+ Create Event</button>
+      <div className="bg-white p-6 rounded-xl shadow-md">
+        <button className="mb-6 bg-green-600 text-white px-5 py-2 rounded-lg hover:bg-green-700">
+          + Create Event
+        </button>
 
-      <div style={styles.list}>
-        {mockEvents.map((event, i) => (
-          <div key={i} style={styles.card}>
-            <h3>{event.title}</h3>
-            <p>Date: {event.date}</p>
-            <p>Volunteers needed: {event.volunteersNeeded}</p>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {mockEvents.map((event, i) => (
+            <div key={i} className="bg-white p-6 rounded-xl border shadow-md">
+              <h3 className="font-semibold text-lg">{event.title}</h3>
+              <p className="text-gray-600 mt-1">📅 {event.date}</p>
+              <p className="text-gray-600">👥 Needed: {event.volunteersNeeded}</p>
 
-            <button style={styles.assignButton}>Assign Volunteers</button>
-          </div>
-        ))}
+              <button className="mt-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+                Assign Volunteers
+              </button>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
-};
-
-// styles
-const styles = {
-  container: {
-    padding: "30px",
-  },
-  header: {
-    marginBottom: "20px",
-  },
-  createButton: {
-    padding: "10px 15px",
-    background: "#28a745",
-    color: "white",
-    border: "none",
-    borderRadius: "6px",
-    cursor: "pointer",
-    marginBottom: "20px",
-  },
-  list: {
-    display: "flex",
-    flexDirection: "column",
-    gap: "15px",
-  },
-  card: {
-    padding: "20px",
-    background: "white",
-    borderRadius: "8px",
-    boxShadow: "0 0 5px rgba(0,0,0,0.1)",
-  },
-  assignButton: {
-    marginTop: "10px",
-    padding: "8px 12px",
-    background: "#007bff",
-    color: "white",
-    border: "none",
-    borderRadius: "5px",
-    cursor: "pointer",
-  },
 };
 
 export default Events;

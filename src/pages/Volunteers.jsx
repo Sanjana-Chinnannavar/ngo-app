@@ -6,71 +6,38 @@ const Volunteers = () => {
   ];
 
   return (
-    <div style={styles.container}>
-      <h1 style={styles.header}>Volunteers</h1>
+    <div className="p-8 max-w-5xl mx-auto">
+      <h1 className="text-3xl font-semibold mb-6">Volunteers</h1>
 
-      <table style={styles.table}>
-        <thead>
-          <tr style={styles.tableHeader}>
-            <th style={styles.th}>Name</th>
-            <th style={styles.th}>Skills</th>
-            <th style={styles.th}>Availability</th>
-            <th style={styles.th}>Actions</th>
-          </tr>
-        </thead>
-
-        <tbody>
-          {mockVolunteers.map((v, index) => (
-            <tr key={index} style={styles.row}>
-              <td style={styles.td}>{v.name}</td>
-              <td style={styles.td}>{v.skills}</td>
-              <td style={styles.td}>{v.availability}</td>
-              <td style={styles.td}>
-                <button style={styles.editBtn}>Edit</button>
-              </td>
+      <div className="bg-white p-6 rounded-xl shadow-md">
+        <table className="w-full border-collapse">
+          <thead>
+            <tr className="bg-gray-200 text-gray-700">
+              <th className="p-3 text-left">Name</th>
+              <th className="p-3 text-left">Skills</th>
+              <th className="p-3 text-left">Availability</th>
+              <th className="p-3 text-left">Actions</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+
+          <tbody>
+            {mockVolunteers.map((v, i) => (
+              <tr key={i} className="border-b hover:bg-gray-50">
+                <td className="p-3">{v.name}</td>
+                <td className="p-3">{v.skills}</td>
+                <td className="p-3">{v.availability}</td>
+                <td className="p-3">
+                  <button className="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700">
+                    Edit
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
-};
-
-// basic inline styles
-const styles = {
-  container: {
-    padding: "30px",
-  },
-  header: {
-    marginBottom: "20px",
-  },
-  table: {
-    width: "100%",
-    borderCollapse: "collapse",
-  },
-  tableHeader: {
-    background: "#f0f0f0",
-  },
-  th: {
-    padding: "12px",
-    borderBottom: "1px solid #ccc",
-    textAlign: "left",
-  },
-  td: {
-    padding: "12px",
-    borderBottom: "1px solid #eee",
-  },
-  row: {
-    background: "white",
-  },
-  editBtn: {
-    padding: "6px 12px",
-    background: "#007bff",
-    color: "white",
-    border: "none",
-    borderRadius: "4px",
-    cursor: "pointer",
-  },
 };
 
 export default Volunteers;

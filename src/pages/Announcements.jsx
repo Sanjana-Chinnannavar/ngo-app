@@ -10,69 +10,37 @@ const Announcements = () => {
   ];
 
   return (
-    <div style={styles.container}>
-      <h1 style={styles.header}>Announcements</h1>
+    <div className="p-8 max-w-5xl mx-auto">
+      <h1 className="text-3xl font-semibold mb-6">Announcements</h1>
 
-      {/* Create announcement */}
-      <div style={styles.createBox}>
-        <input
-          style={styles.input}
-          placeholder="Write a new announcement..."
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-        />
-        <button style={styles.postButton}>Post</button>
+      <div className="bg-white p-6 rounded-xl shadow-md">
+        {/* Create announcement box */}
+        <div className="flex gap-4 mb-6">
+          <input
+            className="flex-1 p-3 border rounded-lg focus:ring focus:ring-blue-200"
+            placeholder="Write a new announcement..."
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+          />
+          <button className="bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700">
+            Post
+          </button>
+        </div>
+
+        {/* Announcements List */}
+        <div className="space-y-4">
+          {mockAnnouncements.map((msg, i) => (
+            <div
+              key={i}
+              className="bg-gray-50 p-4 rounded-lg border shadow-sm"
+            >
+              {msg}
+            </div>
+          ))}
+        </div>
       </div>
-
-      {/* Announcement list */}
-      <ul style={styles.list}>
-        {mockAnnouncements.map((msg, i) => (
-          <li key={i} style={styles.item}>
-            {msg}
-          </li>
-        ))}
-      </ul>
     </div>
   );
-};
-
-// styles
-const styles = {
-  container: {
-    padding: "30px",
-  },
-  header: {
-    marginBottom: "20px",
-  },
-  createBox: {
-    display: "flex",
-    gap: "10px",
-    marginBottom: "25px",
-  },
-  input: {
-    flex: 1,
-    padding: "10px",
-    border: "1px solid #ccc",
-    borderRadius: "6px",
-  },
-  postButton: {
-    padding: "10px 15px",
-    background: "#007bff",
-    color: "white",
-    border: "none",
-    borderRadius: "6px",
-    cursor: "pointer",
-  },
-  list: {
-    paddingLeft: "20px",
-  },
-  item: {
-    marginBottom: "10px",
-    padding: "10px",
-    background: "white",
-    borderRadius: "6px",
-    boxShadow: "0 0 5px rgba(0,0,0,0.1)",
-  },
 };
 
 export default Announcements;
