@@ -6,12 +6,14 @@ const app = express();
 const volunteerRoutes = require("./routes/volunteerRoutes");
 const errorMiddleware = require("./middleware/errorMiddleware");
 const eventRoutes = require("./routes/eventRoutes");
+const announcementRoutes = require("./routes/announcementRoutes");
 
 app.use(express.json());
 app.use(cors());
 app.use("/volunteers", volunteerRoutes);
 app.use(errorMiddleware);
 app.use("/events", eventRoutes);
+app.use("/announcements", announcementRoutes);
 
 
 // test route
