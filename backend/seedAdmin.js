@@ -1,15 +1,12 @@
-const bcrypt = require("bcryptjs");
 const User = require("./models/User");
 const { sequelize } = require("./config/db");
 
 (async () => {
   await sequelize.sync();
 
-  const hashed = await bcrypt.hash("admin123", 10);
-
   await User.create({
     email: "admin@ngo.org",
-    password: hashed,
+    password: "admin123",   // plain text — the model will hash it
     role: "admin"
   });
 

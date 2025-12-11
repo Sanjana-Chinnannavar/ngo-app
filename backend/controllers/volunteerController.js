@@ -1,50 +1,66 @@
 const Volunteer = require("../models/Volunteer");
 const asyncHandler = require("../utils/asyncHandler");
 
+// GET all volunteers
 exports.getVolunteers = asyncHandler(async (req, res) => {
-  const volunteers = await Volunteer.findAll({ order: [["createdAt", "DESC"]] });
+  const volunteers = await Volunteer.findAll({
+    order: [["createdAt", "DESC"]],
+  });
   res.json({ success: true, data: volunteers });
 });
 
+// ADD volunteer
 exports.addVolunteer = asyncHandler(async (req, res) => {
-  const { name, phone, email } = req.body;
+  const { name, email, phone, skills, availability } = req.body;
 
-  if (!name || !phone || !email) {
-    return res.status(400).json({ success: false, message: "All fields required." });
+  if (!name) {
+    return res.status(400).json({
+      success: false,
+      message: "Name is required.",
+    });
   }
 
-  const exists = await Volunteer.findOne({ where: { email } });
-  if (exists) {
-    return res.status(409).json({ success: false, message: "Volunteer already exists." });
-  }
+  const volunteer = await Volunteer.create({
+    name,
+    email,
+    phone,
+    skills,
+    availability,
+  });
 
-  const volunteer = await Volunteer.create(req.body);
   res.status(201).json({ success: true, data: volunteer });
 });
 
+// UPDATE volunteer
 exports.updateVolunteer = asyncHandler(async (req, res) => {
   const { id } = req.params;
 
   const exists = await Volunteer.findByPk(id);
   if (!exists) {
-    return res.status(404).json({ success: false, message: "Volunteer not found." });
+    return res.status(404).json({
+      success: false,
+      message: "Volunteer not found",
+    });
   }
 
-  await Volunteer.update(req.body, { where: { id } });
+  await exists.update(req.body);
 
-  const updated = await Volunteer.findByPk(id);
-  res.json({ success: true, data: updated });
+  res.json({ success: true, data: exists });
 });
 
+// DELETE volunteer
 exports.deleteVolunteer = asyncHandler(async (req, res) => {
   const { id } = req.params;
 
   const exists = await Volunteer.findByPk(id);
   if (!exists) {
-    return res.status(404).json({ success: false, message: "Volunteer not found." });
+    return res.status(404).json({
+      success: false,
+      message: "Volunteer not found",
+    });
   }
 
-  await Volunteer.destroy({ where: { id } });
+  await exists.destroy();
 
-  res.json({ success: true, message: "Volunteer deleted successfully." });
+  res.json({ success: true, message: "Volunteer removed." });
 });

@@ -1,45 +1,59 @@
 const { DataTypes } = require("sequelize");
 const { sequelize } = require("../config/db");
 
-const Event = sequelize.define("Event", {
-  title: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-  description: DataTypes.TEXT,
+const Event = sequelize.define(
+  "Event",
+  {
+    title: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
 
-  date: {
-    type: DataTypes.DATEONLY,
-    allowNull: false,
-  },
+    description: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+    },
 
-  startTime: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
+    date: {
+      type: DataTypes.DATEONLY,
+      allowNull: false,
+    },
 
-  endTime: {
-    type: DataTypes.STRING,
-    allowNull: true,
-  },
+    startTime: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
 
-  location: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
+    endTime: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
 
-  coordinator: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
+    location: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
 
-  status: {
-    type: DataTypes.ENUM("upcoming", "completed", "cancelled"),
-    defaultValue: "upcoming",
+    coordinator: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+
+    status: {
+      type: DataTypes.STRING,
+      defaultValue: "upcoming",
+    },
+
+    volunteersNeeded: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      defaultValue: 0,
+    },
+  },
+  {
+    tableName: "events",
+    timestamps: true,
   }
-}, {
-  tableName: "events",
-  timestamps: true,
-});
+);
 
 module.exports = Event;

@@ -14,7 +14,7 @@ app.use("/volunteers", volunteerRoutes);
 app.use(errorMiddleware);
 app.use("/events", eventRoutes);
 app.use("/announcements", announcementRoutes);
-
+app.use("/auth", authRoutes);
 
 // test route
 app.get("/", (req, res) => {
