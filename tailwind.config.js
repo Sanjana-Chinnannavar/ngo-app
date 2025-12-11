@@ -7,6 +7,7 @@ module.exports = {
     extend: {
       fontFamily: {
         grotesk: ["Space Grotesk", "sans-serif"],
+        source: ["Source Sans Pro", "sans-serif"],
       },
     },
   },
