@@ -20,7 +20,16 @@ const AdminDashboard = () => {
         Admin Dashboard
       </h1>
 
-      <div className="bg-white p-6 rounded-xl shadow-md border border-[#4B86B4]/20">
+      <div 
+        className="
+          p-6 rounded-2xl 
+          border border-white/40 
+          bg-white/20 
+          backdrop-blur-xl 
+          shadow-[0_8px_30px_rgb(0,0,0,0.12)]
+        "
+      >
+
 
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">

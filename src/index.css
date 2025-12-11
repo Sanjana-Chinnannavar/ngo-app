@@ -6,4 +6,5 @@ body {
   @apply bg-gray-100 text-gray-800;
   @apply font-source bg-[#F7F9FB] text-[#1F2933];
   @apply bg-gradient-to-br from-[#EEF5FF] via-[#F7FAFF] to-[#E8F1FF];
+  
 }
