@@ -1,258 +1,182 @@
-import { useState } from "react";
+import { useEffect, useState, useContext } from "react";
+import { AuthContext } from "../context/AuthContext";
+import {
+  getVolunteers,
+  addVolunteer,
+  updateVolunteer,
+  deleteVolunteer,
+} from "../api/volunteers";
 
 const Volunteers = () => {
-  const mockVolunteers = [
-    { name: "Alex Johnson", skills: "First Aid", availability: "Weekends" },
-    { name: "Sanjana Chinnanavar", skills: "Teaching", availability: "Weekdays" },
-    { name: "Riya Sharma", skills: "Event Management", availability: "Flexible" },
-  ];
+  const { token } = useContext(AuthContext);
 
-  const [volunteers, setVolunteers] = useState(mockVolunteers);
+  const [volunteers, setVolunteers] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  // Edit modal
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedVolunteer, setSelectedVolunteer] = useState(null);
-  const [formData, setFormData] = useState({ name: "", skills: "", availability: "" });
+  const [modalOpen, setModalOpen] = useState(false);
+  const [editingVolunteer, setEditingVolunteer] = useState(null);
 
-  // Add modal
-  const [isAddOpen, setIsAddOpen] = useState(false);
-  const [newVolunteer, setNewVolunteer] = useState({ name: "", skills: "", availability: "" });
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    skills: "",
+    availability: "",
+  });
 
-  // Delete modal
-  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
-  const [volunteerToDelete, setVolunteerToDelete] = useState(null);
-
-  // Open Edit Modal
-  const openModal = (vol) => {
-    setSelectedVolunteer(vol);
-    setFormData(vol);
-    setIsModalOpen(true);
+  // Load all volunteers
+  const loadVolunteers = async () => {
+    setLoading(true);
+    try {
+      const data = await getVolunteers(token);
+      setVolunteers(data);
+    } catch (err) {
+      alert(err.message);
+    }
+    setLoading(false);
   };
 
-  const closeModal = () => {
-    setIsModalOpen(false);
-    setSelectedVolunteer(null);
+  useEffect(() => {
+    loadVolunteers();
+  }, []);
+
+  // Open modal for edit/create
+  const openModal = (vol = null) => {
+    setEditingVolunteer(vol);
+
+    if (vol) {
+      setFormData({
+        name: vol.name,
+        email: vol.email,
+        phone: vol.phone,
+        skills: vol.skills || "",
+        availability: vol.availability || "",
+      });
+    } else {
+      setFormData({
+        name: "",
+        email: "",
+        phone: "",
+        skills: "",
+        availability: "",
+      });
+    }
+
+    setModalOpen(true);
   };
 
-  const handleSave = () => {
-    const updated = volunteers.map((v) =>
-      v.name === selectedVolunteer.name ? formData : v
-    );
-    setVolunteers(updated);
-    closeModal();
+  // Save volunteer
+  const handleSave = async () => {
+    try {
+      if (editingVolunteer) {
+        await updateVolunteer(token, editingVolunteer.id, formData);
+      } else {
+        await addVolunteer(token, formData);
+      }
+
+      setModalOpen(false);
+      loadVolunteers();
+    } catch (err) {
+      alert(err.message);
+    }
   };
 
-  // Delete Modal
-  const openDeleteModal = (vol) => {
-    setVolunteerToDelete(vol);
-    setDeleteModalOpen(true);
+  // Delete volunteer
+  const handleDelete = async (id) => {
+    if (!confirm("Delete volunteer?")) return;
+
+    try {
+      await deleteVolunteer(token, id);
+      loadVolunteers();
+    } catch (err) {
+      alert(err.message);
+    }
   };
 
-  const closeDeleteModal = () => {
-    setDeleteModalOpen(false);
-    setVolunteerToDelete(null);
-  };
-
-  const confirmDelete = () => {
-    const updated = volunteers.filter((v) => v.name !== volunteerToDelete.name);
-    setVolunteers(updated);
-    closeDeleteModal();
-  };
-
-  // Add Volunteer Modal
-  const openAddModal = () => {
-    setNewVolunteer({ name: "", skills: "", availability: "" });
-    setIsAddOpen(true);
-  };
-
-  const closeAddModal = () => {
-    setIsAddOpen(false);
-  };
-
-  const handleAddVolunteer = () => {
-    setVolunteers([...volunteers, newVolunteer]);
-    closeAddModal();
-  };
+  if (loading) return <p className="text-center mt-10">Loading volunteers…</p>;
 
   return (
     <div className="p-8 max-w-5xl mx-auto">
+      <h1 className="text-3xl font-semibold text-[#2A4D69] mb-6">
+        Volunteers
+      </h1>
 
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-semibold text-[#2A4D69] tracking-tight">
-          Volunteers
-        </h1>
+      <button
+        className="bg-[#2A4D69] text-white px-5 py-2 rounded-lg mb-6"
+        onClick={() => openModal()}
+      >
+        + Add Volunteer
+      </button>
 
-        {/* ADD VOLUNTEER BUTTON */}
-        <button
-          onClick={openAddModal}
-          className="
-            px-5 py-2 rounded-lg 
-            bg-[#245629] text-white 
-            hover:bg-[#1E3A51] transition 
-            font-grotesk text-sm tracking-wide
-          "
-        >
-          + Add Volunteer
-        </button>
-      </div>
+      <div className="space-y-4">
+        {volunteers.map((v) => (
+          <div
+            key={v.id}
+            className="bg-[#F7F9FB] p-5 rounded-xl border border-[#4B86B4]/20 shadow-sm"
+          >
+            <h3 classend="text-xl font-semibold text-[#2A4D69]">
+              {v.name}
+            </h3>
 
-      <div className="bg-white p-6 rounded-xl shadow-md border border-[#4B86B4]/20">
+            <p className="text-[#3E4C59]">📧 {v.email}</p>
+            <p className="text-[#3E4C59]">📞 {v.phone}</p>
 
-        <div className="overflow-x-auto">
-          <table className="w-full border-collapse font-source">
-            <thead>
-              <tr className="bg-[#4B86B4]/20 text-[#2A4D69] text-[15px]">
-                <th className="p-3 text-left border-b border-[#4B86B4]/30">Name</th>
-                <th className="p-3 text-left border-b border-[#4B86B4]/30">Skills</th>
-                <th className="p-3 text-left border-b border-[#4B86B4]/30">Availability</th>
+            {v.skills && <p className="text-[#3E4C59] mt-1">🛠 {v.skills}</p>}
+            {v.availability && (
+              <p className="text-[#3E4C59]">📅 {v.availability}</p>
+            )}
 
-                {/* ACTIONS HEADER CENTERED */}
-                <th className="p-3 text-center border-b border-[#4B86B4]/30">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-
-            <tbody>
-              {volunteers.map((v, i) => (
-                <tr
-                  key={i}
-                  className="border-b border-[#4B86B4]/20 hover:bg-[#F7F9FB] transition"
-                >
-                  <td className="p-3 text-base text-[#1F2933]">{v.name}</td>
-                  <td className="p-3 text-base text-[#3E4C59]">{v.skills}</td>
-                  <td className="p-3 text-base text-[#3E4C59]">{v.availability}</td>
-
-                  <td className="p-3 flex justify-center gap-3">
-
-                    {/* EDIT BUTTON */}
-                    <button
-                      onClick={() => openModal(v)}
-                      className="
-                        bg-[#2A4D69] text-white px-3 py-1 rounded 
-                        hover:bg-[#1E3A51] transition 
-                        font-grotesk text-sm tracking-wide
-                      "
-                    >
-                      Edit
-                    </button>
-
-                    {/* DELETE BUTTON */}
-                    <button
-                      onClick={() => openDeleteModal(v)}
-                      className="
-                        bg-red-700 text-white px-3 py-1 rounded 
-                        hover:bg-red-800 transition 
-                        font-grotesk text-sm tracking-wide
-                      "
-                    >
-                      Delete
-                    </button>
-
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-
-          </table>
-        </div>
-      </div>
-
-      {/* ---------------- ADD VOLUNTEER MODAL ---------------- */}
-      {isAddOpen && (
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-          <div className="bg-white p-6 w-full max-w-md rounded-xl shadow-xl border border-[#4B86B4]/20 font-grotesk">
-
-            <h2 className="text-xl font-semibold text-[#2A4D69] mb-4 tracking-tight">
-              Add New Volunteer
-            </h2>
-
-            <div className="space-y-4">
-              <div>
-                <label className="block text-[#3E4C59] mb-1">Name</label>
-                <input
-                  type="text"
-                  value={newVolunteer.name}
-                  onChange={(e) => setNewVolunteer({ ...newVolunteer, name: e.target.value })}
-                  className="w-full p-2 border rounded-lg focus:ring focus:ring-[#4B86B4]/30"
-                />
-              </div>
-
-              <div>
-                <label className="block text-[#3E4C59] mb-1">Skills</label>
-                <input
-                  type="text"
-                  value={newVolunteer.skills}
-                  onChange={(e) => setNewVolunteer({ ...newVolunteer, skills: e.target.value })}
-                  className="w-full p-2 border rounded-lg focus:ring focus:ring-[#4B86B4]/30"
-                />
-              </div>
-
-              <div>
-                <label className="block text-[#3E4C59] mb-1">Availability</label>
-                <input
-                  type="text"
-                  value={newVolunteer.availability}
-                  onChange={(e) =>
-                    setNewVolunteer({ ...newVolunteer, availability: e.target.value })
-                  }
-                  className="w-full p-2 border rounded-lg focus:ring focus:ring-[#4B86B4]/30"
-                />
-              </div>
-            </div>
-
-            <div className="flex justify-end gap-3 mt-6">
+            <div className="mt-4 space-x-4">
               <button
-                onClick={closeAddModal}
-                className="px-4 py-2 rounded-lg border border-[#2A4D69] text-[#2A4D69] hover:bg-[#E7EEF3]"
+                onClick={() => openModal(v)}
+                className="text-blue-600 hover:underline"
               >
-                Cancel
+                Edit
               </button>
 
               <button
-                onClick={handleAddVolunteer}
-                className="px-4 py-2 rounded-lg bg-[#245629] text-white hover:bg-[#1E3A51]"
-              >
-                Add
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ---------------- DELETE CONFIRMATION MODAL ---------------- */}
-      {deleteModalOpen && (
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-          <div className="bg-white p-6 w-full max-w-md rounded-xl shadow-xl border border-red-300 font-grotesk">
-
-            <h2 className="text-xl font-semibold text-red-800 mb-4 tracking-tight">
-              Confirm Delete
-            </h2>
-
-            <p className="text-[#3E4C59] mb-6">
-              Are you sure you want to delete <strong>{volunteerToDelete?.name}</strong>?
-            </p>
-
-            <div className="flex justify-end gap-3">
-              <button
-                onClick={closeDeleteModal}
-                className="px-4 py-2 rounded-lg border border-gray-400 text-gray-700 hover:bg-gray-100"
-              >
-                Cancel
-              </button>
-
-              <button
-                onClick={confirmDelete}
-                className="px-4 py-2 rounded-lg bg-red-700 text-white hover:bg-red-800"
+                onClick={() => handleDelete(v.id)}
+                className="text-red-600 hover:underline"
               >
                 Delete
               </button>
             </div>
+          </div>
+        ))}
+      </div>
 
+      {/* Modal */}
+      {modalOpen && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center">
+          <div className="bg-white p-6 rounded-xl w-full max-w-lg space-y-4">
+            <h2 className="text-2xl font-semibold">
+              {editingVolunteer ? "Edit Volunteer" : "Add Volunteer"}
+            </h2>
+
+            {["name", "email", "phone", "skills", "availability"].map((key) => (
+              <input
+                key={key}
+                placeholder={key.charAt(0).toUpperCase() + key.slice(1)}
+                value={formData[key]}
+                onChange={(e) =>
+                  setFormData({ ...formData, [key]: e.target.value })
+                }
+                className="w-full p-3 border rounded-lg"
+              />
+            ))}
+
+            <div className="flex justify-end space-x-4">
+              <button onClick={() => setModalOpen(false)}>Cancel</button>
+              <button
+                onClick={handleSave}
+                className="bg-[#2A4D69] text-white px-4 py-2 rounded-lg"
+              >
+                Save
+              </button>
+            </div>
           </div>
         </div>
       )}
-
     </div>
   );
 };

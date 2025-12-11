@@ -1,30 +1,33 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useState } from "react";
 
-const AuthContext = createContext(null);
+export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null); // null | {name, role}
+  const [token, setToken] = useState(localStorage.getItem("token") || null);
+  const [user, setUser] = useState(
+    JSON.parse(localStorage.getItem("user")) || null
+  );
 
-  const login = (email, password) => {
-    // TEMP DEMO LOGIN — Replace later
-    if (email === "admin@ngo.org" && password === "admin123") {
-      setUser({ name: "Admin User", role: "admin" });
-      return true;
-    }
-    if (email === "volunteer@ngo.org" && password === "vol123") {
-      setUser({ name: "Volunteer User", role: "volunteer" });
-      return true;
-    }
-    return false;
+  const login = (token, user) => {
+    setToken(token);
+    setUser(user);
+
+    localStorage.setItem("token", token);
+    localStorage.setItem("user", JSON.stringify(user));
   };
 
-  const logout = () => setUser(null);
+  const logout = () => {
+    setToken(null);
+    setUser(null);
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+  };
+
+  const isAuthenticated = !!token;
 
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
+    <AuthContext.Provider value={{ token, user, login, logout, isAuthenticated }}>
       {children}
     </AuthContext.Provider>
   );
 };
-
-export const useAuth = () => useContext(AuthContext);

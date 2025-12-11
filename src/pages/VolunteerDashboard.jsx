@@ -1,17 +1,46 @@
-import { useNavigate } from "react-router-dom";
+import { useEffect, useState, useContext } from "react";
+import { AuthContext } from "../context/AuthContext";
+import { getEvents } from "../api/events";
+import { getAnnouncements } from "../api/announcements";
 
 const VolunteerDashboard = () => {
-  const navigate = useNavigate();
+  const { token, user } = useContext(AuthContext);
 
-  const assignedEvents = [
-    { title: "Tree Plantation", date: "Jan 20, 2025" },
-    { title: "Food Donation Camp", date: "Jan 26, 2025" },
-  ];
+  const [assignedEvents, setAssignedEvents] = useState([]);
+  const [announcements, setAnnouncements] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const announcements = [
-    "Mandatory orientation meeting on Jan 18.",
-    "Please update your availability form.",
-  ];
+  const loadDashboard = async () => {
+    try {
+      const eventsRes = await getEvents(token);
+      const events = eventsRes.data;
+
+      const annsRes = await getAnnouncements(token);
+      const ann = annsRes.data;
+
+      // Temporary logic: show events coordinated by this volunteer
+      const filtered = events.filter(
+        (e) =>
+          e.coordinator?.toLowerCase() === user?.role?.toLowerCase() ||
+          true // until assignment system added
+      );
+
+      setAssignedEvents(filtered.slice(0, 3)); // show only first 3 for clean UI
+      setAnnouncements(ann);
+    } catch (err) {
+      alert("Failed to load volunteer dashboard");
+    }
+
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    loadDashboard();
+  }, []);
+
+  if (loading) {
+    return <p className="text-center mt-10">Loading dashboard…</p>;
+  }
 
   return (
     <div className="p-8 max-w-5xl mx-auto">
@@ -23,14 +52,18 @@ const VolunteerDashboard = () => {
 
         {/* Assigned Events */}
         <section>
-          <h2 className="text-xl font-semibold text-[#2A4D69] tracking-tight mb-3">
-            <b>Assigned Events</b>
+          <h2 className="text-xl font-semibold text-[#2A4D69] mb-3">
+            Assigned Events
           </h2>
 
+          {assignedEvents.length === 0 && (
+            <p className="text-gray-500">No assigned events.</p>
+          )}
+
           <div className="space-y-3">
-            {assignedEvents.map((event, i) => (
+            {assignedEvents.map((event) => (
               <div
-                key={i}
+                key={event.id}
                 className="bg-[#F7F9FB] p-4 rounded-lg border border-[#4B86B4]/20 shadow-sm"
               >
                 <h3 className="font-medium text-[#2A4D69] text-lg">
@@ -44,33 +77,21 @@ const VolunteerDashboard = () => {
 
         {/* Announcements */}
         <section>
-          <h2 className="text-xl font-semibold text-[#2A4D69] tracking-tight mb-3">
-            <b>Announcements</b>
+          <h2 className="text-xl font-semibold text-[#2A4D69] mb-3">
+            Announcements
           </h2>
 
           <ul className="space-y-3">
-            {announcements.map((msg, i) => (
+            {announcements.map((msg) => (
               <li
-                key={i}
+                key={msg.id}
                 className="bg-[#F7F9FB] p-4 rounded-lg border border-[#4B86B4]/20 shadow-sm text-[#3E4C59]"
               >
-                {msg}
+                {msg.message}
               </li>
             ))}
           </ul>
         </section>
-
-        {/* Browse Events Button */}
-        <button
-          onClick={() => navigate("/events")}
-          className="
-            bg-[#2A4D69] text-white px-5 py-2 rounded-lg 
-            hover:bg-[#1E3A51] transition 
-            font-grotesk text-sm tracking-wide
-          "
-        >
-          View All Events
-        </button>
 
       </div>
     </div>
