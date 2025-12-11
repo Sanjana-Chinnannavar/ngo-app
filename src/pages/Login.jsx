@@ -1,46 +1,24 @@
-import { useState } from "react";
-import { useAuth } from "../context/AuthContext";
-import { useNavigate } from "react-router-dom";
-
 const Login = () => {
-  const { login } = useAuth();
-  const navigate = useNavigate();
-
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const ok = login(email, password);
-    if (ok) {
-      navigate("/admin"); // temp redirect
-    } else {
-      setError("Invalid credentials");
-    }
-  };
-
   return (
-    <div style={{ padding: 20 }}>
-      <h2>Login</h2>
-      <form onSubmit={handleSubmit}>
+    <div className="flex items-center justify-center min-h-screen bg-gray-100 px-4">
+      <div className="bg-white p-8 rounded-xl shadow-lg w-full max-w-sm">
+        <h2 className="text-2xl font-semibold mb-5 text-center">Login</h2>
+
         <input
+          className="w-full p-3 border rounded-lg mb-4 focus:ring focus:ring-blue-200"
           placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        /><br />
+        />
 
         <input
-          placeholder="Password"
+          className="w-full p-3 border rounded-lg mb-4 focus:ring focus:ring-blue-200"
           type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        /><br />
+          placeholder="Password"
+        />
 
-        {error && <p style={{color: 'red'}}>{error}</p>}
-
-        <button>Login</button>
-      </form>
+        <button className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition">
+          Login
+        </button>
+      </div>
     </div>
   );
 };
