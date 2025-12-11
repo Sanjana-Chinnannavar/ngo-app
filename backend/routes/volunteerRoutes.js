@@ -6,16 +6,17 @@ const {
   deleteVolunteer
 } = require("../controllers/volunteerController");
 
+const auth = require("../middleware/authMiddleware");
+const admin = require("../middleware/adminMiddleware");
+
 const router = express.Router();
 
-// /volunteers/
-router.route("/")
-  .get(getVolunteers)
-  .post(addVolunteer);
+// Public (or login required? You decide)
+router.get("/", getVolunteers);
 
-// /volunteers/:id
-router.route("/:id")
-  .put(updateVolunteer)
-  .delete(deleteVolunteer);
+// Admin only — CRUD
+router.post("/", auth, admin, addVolunteer);
+router.put("/:id", auth, admin, updateVolunteer);
+router.delete("/:id", auth, admin, deleteVolunteer);
 
 module.exports = router;

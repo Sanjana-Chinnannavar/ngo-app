@@ -1,15 +1,19 @@
-const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
+const asyncHandler = require("../utils/asyncHandler");
 
-exports.login = async (req, res) => {
+exports.login = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
 
   const user = await User.findOne({ where: { email } });
-  if (!user) return res.status(400).json({ message: "User not found" });
+  if (!user) {
+    return res.status(400).json({ success: false, message: "User not found." });
+  }
 
-  const match = await bcrypt.compare(password, user.password);
-  if (!match) return res.status(400).json({ message: "Invalid password" });
+  const isValid = await user.validatePassword(password);
+  if (!isValid) {
+    return res.status(400).json({ success: false, message: "Invalid password." });
+  }
 
   const token = jwt.sign(
     { id: user.id, role: user.role },
@@ -17,5 +21,13 @@ exports.login = async (req, res) => {
     { expiresIn: "1d" }
   );
 
-  res.json({ token, role: user.role });
-};
+  res.json({
+    success: true,
+    token,
+    user: { 
+      id: user.id, 
+      email: user.email, 
+      role: user.role 
+    }
+  });
+});
