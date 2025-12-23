@@ -9,7 +9,7 @@ import {
 
 const Events = () => {
   const { user } = useContext(AuthContext);
-  const isAdmin = user?.role === "admin";
+  const token = localStorage.getItem("token");
 
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -29,12 +29,13 @@ const Events = () => {
     status: "upcoming",
   });
 
-  // Load events from backend
+  // Load events
   const loadEvents = async () => {
     setLoading(true);
     try {
       const res = await getEvents();
-      setEvents(res.data || []);
+      const data = Array.isArray(res) ? res : res?.data || [];
+      setEvents(data);
     } catch (err) {
       console.error(err);
       alert("Failed to load events.");
@@ -46,7 +47,7 @@ const Events = () => {
     loadEvents();
   }, []);
 
-  // Open modal (edit or create)
+  // Open modal
   const openModal = (event = null) => {
     setEditingEvent(event);
 
@@ -79,18 +80,25 @@ const Events = () => {
     setModalOpen(true);
   };
 
-  // Save event (create/update)
+  // Save event
   const handleSave = async () => {
     try {
-      if (editingEvent) {
-        await updateEvent(editingEvent.id, formData);
-      } else {
-        await addEvent(formData);
+      if (!token) {
+        alert("You must be logged in to add events.");
+        return;
       }
+
+      if (editingEvent) {
+        await updateEvent(token, editingEvent.id, formData);
+      } else {
+        await addEvent(token, formData);
+      }
+
       setModalOpen(false);
       await loadEvents();
     } catch (err) {
-      alert(err.message);
+      console.error(err);
+      alert(err.message || "Failed to save event.");
     }
   };
 
@@ -99,10 +107,11 @@ const Events = () => {
     if (!confirm("Are you sure you want to delete this event?")) return;
 
     try {
-      await deleteEvent(id);
+      await deleteEvent(token, id);
       await loadEvents();
     } catch (err) {
-      alert(err.message);
+      console.error(err);
+      alert(err.message || "Failed to delete event.");
     }
   };
 
@@ -112,16 +121,17 @@ const Events = () => {
 
   return (
     <div className="p-8 max-w-5xl mx-auto">
-      <h1 className="text-3xl font-semibold text-[#2A4D69] mb-6">Events</h1>
+      <h1 className="text-3xl font-semibold text-[#2A4D69] mb-6">
+        Events
+      </h1>
 
-      {isAdmin && (
-        <button
-          className="bg-[#2A4D69] text-white px-5 py-2 rounded-lg mb-6"
-          onClick={() => openModal()}
-        >
-          + Add Event
-        </button>
-      )}
+      {/* 🔥 BUTTON ALWAYS SHOWN */}
+      <button
+        className="bg-[#2A4D69] text-white px-5 py-2 rounded-lg mb-6"
+        onClick={() => openModal()}
+      >
+        + Add Event
+      </button>
 
       <div className="space-y-4">
         {events.map((event) => (
@@ -129,7 +139,9 @@ const Events = () => {
             key={event.id}
             className="bg-[#F7F9FB] p-5 rounded-xl border border-[#4B86B4]/20 shadow-sm"
           >
-            <h3 className="text-xl text-[#2A4D69] font-semibold">{event.title}</h3>
+            <h3 className="text-xl text-[#2A4D69] font-semibold">
+              {event.title}
+            </h3>
 
             <p className="text-[#3E4C59] mt-1">
               📅 {event.date} • 🕒 {event.startTime}
@@ -137,7 +149,9 @@ const Events = () => {
             </p>
 
             <p className="text-[#3E4C59]">📍 {event.location}</p>
-            <p className="text-[#3E4C59]">👤 Coordinator: {event.coordinator}</p>
+            <p className="text-[#3E4C59]">
+              👤 Coordinator: {event.coordinator}
+            </p>
             <p className="text-[#3E4C59]">
               👥 Volunteers Needed: {event.volunteersNeeded}
             </p>
@@ -148,22 +162,21 @@ const Events = () => {
               </p>
             )}
 
-            {isAdmin && (
-              <div className="mt-4 space-x-4">
-                <button
-                  onClick={() => openModal(event)}
-                  className="text-blue-600 hover:underline"
-                >
-                  Edit
-                </button>
-                <button
-                  onClick={() => handleDelete(event.id)}
-                  className="text-red-600 hover:underline"
-                >
-                  Delete
-                </button>
-              </div>
-            )}
+            {/* delete/edit still available */}
+            <div className="mt-4 space-x-4">
+              <button
+                onClick={() => openModal(event)}
+                className="text-blue-600 hover:underline"
+              >
+                Edit
+              </button>
+              <button
+                onClick={() => handleDelete(event.id)}
+                className="text-red-600 hover:underline"
+              >
+                Delete
+              </button>
+            </div>
           </div>
         ))}
       </div>
@@ -176,7 +189,6 @@ const Events = () => {
               {editingEvent ? "Edit Event" : "Add Event"}
             </h2>
 
-            {/* Input fields */}
             {[
               ["title", "Title"],
               ["date", "Date", "date"],
@@ -198,7 +210,6 @@ const Events = () => {
               />
             ))}
 
-            {/* Description */}
             <textarea
               placeholder="Description (optional)"
               value={formData.description}
