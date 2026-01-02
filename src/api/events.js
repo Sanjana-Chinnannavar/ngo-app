@@ -1,55 +1,81 @@
 const API_URL = "http://localhost:5000/events";
 
-const authHeader = () => ({
-  Authorization: `Bearer ${localStorage.getItem("token")}`,
-});
-
-// 🔹 GET ALL EVENTS (admin + volunteer)
-export const getEvents = async () => {
+// GET EVENTS
+export const getEvents = async (token) => {
   const res = await fetch(API_URL, {
-    headers: authHeader(),
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
   });
 
-  if (!res.ok) throw new Error("Failed to fetch events");
-  return res.json();
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message || "Failed to fetch events");
+
+  return data; // { success, data }
 };
 
-// 🔹 CREATE EVENT (admin)
-export const createEvent = async (eventData) => {
+// CREATE EVENT  ✅ THIS IS THE ONLY CREATE FUNCTION
+export const addEvent = async (token, eventData) => {
   const res = await fetch(API_URL, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      ...authHeader(),
+      Authorization: `Bearer ${token}`,
     },
-    body: JSON.stringify(eventData),
+    body: JSON.stringify(eventData), // ✅ ONLY EVENT DATA
   });
 
-  if (!res.ok) throw new Error("Failed to create event");
-  return res.json();
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message || "Failed to add event");
+
+  return data;
 };
 
-// 🔹 UPDATE EVENT (admin)
-export const updateEvent = async (id, eventData) => {
+// UPDATE
+export const updateEvent = async (token, id, eventData) => {
   const res = await fetch(`${API_URL}/${id}`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
-      ...authHeader(),
+      Authorization: `Bearer ${token}`,
     },
     body: JSON.stringify(eventData),
   });
 
-  if (!res.ok) throw new Error("Failed to update event");
-  return res.json();
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message || "Failed to update event");
+
+  return data;
 };
 
-// 🔹 DELETE EVENT (admin)
-export const deleteEvent = async (id) => {
+// DELETE
+export const deleteEvent = async (token, id) => {
   const res = await fetch(`${API_URL}/${id}`, {
     method: "DELETE",
-    headers: authHeader(),
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
   });
 
-  if (!res.ok) throw new Error("Failed to delete event");
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message || "Failed to delete event");
+
+  return data;
+};
+
+// ASSIGN
+export const assignEvent = async (token, eventId, volunteerId) => {
+  const res = await fetch(`${API_URL}/${eventId}/assign`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ volunteerId }),
+  });
+
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message || "Assignment failed");
+
+  return data;
 };

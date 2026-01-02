@@ -55,5 +55,12 @@ const Event = sequelize.define(
     timestamps: true,
   }
 );
+Event.associate = (models) => {
+  Event.belongsToMany(models.Volunteer, {
+    through: models.EventAssignment,
+    foreignKey: "eventId",
+    otherKey: "volunteerId",
+  });
+};
 
 module.exports = Event;

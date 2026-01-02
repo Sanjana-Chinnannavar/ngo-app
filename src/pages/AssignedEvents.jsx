@@ -66,7 +66,9 @@ const AssignedEvents = () => {
               </p>
 
               {/* VOLUNTEER-ONLY */}
-              {isVolunteer(user) && event.status === "PENDING" && (
+              {isVolunteer(user) && event.status?.toLowerCase() === "upcoming" && (
+
+
                 <div className="mt-4 space-x-4">
                   <button
                     onClick={() => handleAccept(event.id)}

@@ -65,7 +65,7 @@ const CalendarPage = () => {
   // On event click
   const handleSelectEvent = (event) => {
     if (isAdmin) {
-      alert(`Admin can edit event: ${event.title}`);
+      alert(` ${event.title}`);
       // later: open edit modal
     } else {
       alert(
