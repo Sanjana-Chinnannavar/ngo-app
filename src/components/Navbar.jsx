@@ -1,9 +1,12 @@
 import { Link, useNavigate } from "react-router-dom";
+import { Heart, LogOut, Menu, X } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
+import { useState } from "react";
 
 const Navbar = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   if (!user) return null;
 
@@ -12,76 +15,99 @@ const Navbar = () => {
     navigate("/login");
   };
 
+  const navLinks = [
+    {
+      label: "Dashboard",
+      href: user.role === "admin" ? "/admin" : "/volunteer",
+    },
+    { label: "Events", href: "/events" },
+    { label: "Announcements", href: "/announcements" },
+    { label: "Calendar", href: "/calendar" },
+    ...(user.role === "admin" ? [{ label: "Volunteers", href: "/volunteers" }] : []),
+  ];
+
   return (
-    <nav 
-      className="
-        bg-[#2A4D69] 
-        text-[#F7F9FB] 
-        px-8 py-4 
-        shadow-md 
-        flex justify-between items-center
-        border-b border-[#4B86B4]
-        font-grotesk
-      "
-    >
-      {/* LEFT: TITLE + ROLE */}
-      <div>
-        <h2 className="text-2xl font-semibold tracking-tight">
-          NGO Portal
-        </h2>
-        <p className="text-sm text-[#C9A86A] tracking-wide">
-          Logged in as: <span className="uppercase">{user.role}</span>
-        </p>
-      </div>
+    <nav className="sticky top-0 z-50 bg-white border-b border-gray-100 shadow-sm">
+      <div className="max-w-7xl mx-auto px-6 py-4">
+        <div className="flex justify-between items-center">
+          {/* LEFT: LOGO + TITLE */}
+          <div className="flex items-center gap-3 flex-shrink-0">
+            <div className="w-10 h-10 bg-gradient-to-br from-teal-500 to-teal-600 rounded-xl flex items-center justify-center shadow-lg">
+              <Heart className="w-5 h-5 text-white" />
+            </div>
+            <div>
+              <h1 className="text-xl font-bold text-gray-900">NGO Portal</h1>
+              <p className="text-xs text-teal-600 font-medium">
+                {user.role === "admin" ? "Administrator" : "Volunteer"}
+              </p>
+            </div>
+          </div>
 
-      {/* CENTER: LINKS */}
-      <div className="flex gap-6 text-base font-medium tracking-wide">
-        {/* DASHBOARD */}
-        <Link
-          to={user.role === "admin" ? "/admin" : "/volunteer"}
-          className="hover:text-[#C9A86A] transition-colors"
-        >
-          Dashboard
-        </Link>
+          {/* CENTER: LINKS (DESKTOP) */}
+          <div className="hidden md:flex items-center gap-1">
+            {navLinks.map((link) => (
+              <Link
+                key={link.href}
+                to={link.href}
+                className="px-4 py-2 text-gray-700 font-medium text-sm rounded-lg hover:bg-teal-50 hover:text-teal-600 transition-all duration-300"
+              >
+                {link.label}
+              </Link>
+            ))}
+          </div>
 
-        {/* SHARED LINKS */}
-        <Link to="/events" className="hover:text-[#C9A86A] transition-colors">
-          Events
-        </Link>
+          {/* RIGHT: LOGOUT + MOBILE MENU */}
+          <div className="flex items-center gap-3">
+            <button
+              onClick={handleLogout}
+              className="hidden sm:flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-teal-500 to-teal-600 text-white font-medium rounded-lg hover:shadow-lg hover:shadow-teal-200 transition-all duration-300 hover:-translate-y-0.5"
+            >
+              <LogOut className="w-4 h-4" />
+              <span className="hidden md:inline">Logout</span>
+            </button>
 
-        <Link to="/announcements" className="hover:text-[#C9A86A] transition-colors">
-          Announcements
-        </Link>
+            {/* MOBILE MENU BUTTON */}
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="md:hidden p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            >
+              {mobileMenuOpen ? (
+                <X className="w-6 h-6 text-gray-900" />
+              ) : (
+                <Menu className="w-6 h-6 text-gray-900" />
+              )}
+            </button>
+          </div>
+        </div>
 
-        <Link to="/calendar" className="hover:text-[#C9A86A] transition-colors">
-          Calendar
-        </Link>
-
-        {/* ADMIN-ONLY */}
-        {user.role === "admin" && (
-          <Link
-            to="/volunteers"
-            className="hover:text-[#C9A86A] transition-colors"
-          >
-            Volunteers
-          </Link>
+        {/* MOBILE MENU */}
+        {mobileMenuOpen && (
+          <div className="md:hidden mt-4 pb-4 border-t border-gray-100 pt-4 animate-in slide-in-from-top-2">
+            <div className="space-y-2">
+              {navLinks.map((link) => (
+                <Link
+                  key={link.href}
+                  to={link.href}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="block px-4 py-3 text-gray-700 font-medium rounded-lg hover:bg-teal-50 hover:text-teal-600 transition-all duration-300"
+                >
+                  {link.label}
+                </Link>
+              ))}
+              <button
+                onClick={() => {
+                  handleLogout();
+                  setMobileMenuOpen(false);
+                }}
+                className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-teal-500 to-teal-600 text-white font-medium rounded-lg hover:shadow-lg transition-all duration-300 mt-2"
+              >
+                <LogOut className="w-4 h-4" />
+                Logout
+              </button>
+            </div>
+          </div>
         )}
       </div>
-
-      {/* RIGHT: LOGOUT */}
-      <button
-        onClick={handleLogout}
-        className="
-          bg-[#C94C4C] 
-          px-4 py-2 
-          rounded 
-          hover:bg-[#B13E3E]
-          transition-colors
-          font-medium
-        "
-      >
-        Logout
-      </button>
     </nav>
   );
 };
