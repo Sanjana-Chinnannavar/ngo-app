@@ -1,63 +1,55 @@
 const API_URL = "http://localhost:5000/events";
 
-// GET ALL EVENTS
-export const getEvents = async (token) => {
+const authHeader = () => ({
+  Authorization: `Bearer ${localStorage.getItem("token")}`,
+});
+
+// 🔹 GET ALL EVENTS (admin + volunteer)
+export const getEvents = async () => {
   const res = await fetch(API_URL, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
+    headers: authHeader(),
   });
 
   if (!res.ok) throw new Error("Failed to fetch events");
-
-  return res.json(); // { success, data }
+  return res.json();
 };
 
-// ADD NEW EVENT
-export const addEvent = async (token, eventData) => {
+// 🔹 CREATE EVENT (admin)
+export const createEvent = async (eventData) => {
   const res = await fetch(API_URL, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
+      ...authHeader(),
     },
     body: JSON.stringify(eventData),
   });
 
-  if (!res.ok) {
-    const error = await res.json();
-    throw new Error(error.message || "Failed to add event");
-  }
-
+  if (!res.ok) throw new Error("Failed to create event");
   return res.json();
 };
 
-// UPDATE EVENT
-export const updateEvent = async (token, id, eventData) => {
+// 🔹 UPDATE EVENT (admin)
+export const updateEvent = async (id, eventData) => {
   const res = await fetch(`${API_URL}/${id}`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
+      ...authHeader(),
     },
     body: JSON.stringify(eventData),
   });
 
   if (!res.ok) throw new Error("Failed to update event");
-
   return res.json();
 };
 
-// DELETE EVENT
-export const deleteEvent = async (token, id) => {
+// 🔹 DELETE EVENT (admin)
+export const deleteEvent = async (id) => {
   const res = await fetch(`${API_URL}/${id}`, {
     method: "DELETE",
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
+    headers: authHeader(),
   });
 
   if (!res.ok) throw new Error("Failed to delete event");
-
-  return res.json();
 };

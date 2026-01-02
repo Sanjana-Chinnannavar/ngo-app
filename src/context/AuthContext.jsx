@@ -1,17 +1,16 @@
-import { createContext, useState } from "react";
+import { createContext, useContext, useState } from "react";
 
-export const AuthContext = createContext();
+export const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
-  const [token, setToken] = useState(localStorage.getItem("token") || null);
+  const [token, setToken] = useState(localStorage.getItem("token"));
   const [user, setUser] = useState(
-    JSON.parse(localStorage.getItem("user")) || null
+    JSON.parse(localStorage.getItem("user"))
   );
 
   const login = (token, user) => {
     setToken(token);
     setUser(user);
-
     localStorage.setItem("token", token);
     localStorage.setItem("user", JSON.stringify(user));
   };
@@ -23,11 +22,12 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem("user");
   };
 
-  const isAuthenticated = !!token;
-
   return (
-    <AuthContext.Provider value={{ token, user, login, logout, isAuthenticated }}>
+    <AuthContext.Provider value={{ token, user, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
 };
+
+// ✅ THIS FIXES YOUR ERROR
+export const useAuth = () => useContext(AuthContext);
