@@ -13,12 +13,15 @@ const Announcements = () => {
 
   const [announcements, setAnnouncements] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
+
+  // REQUIRED FIELDS
+  const [title, setTitle] = useState("");
   const [message, setMessage] = useState("");
 
-  // 🔹 Fetch announcements (IMPORTANT FIX: res.data)
+  // 🔹 Fetch announcements
   const fetchAnnouncements = async () => {
     const res = await getAnnouncements();
-    setAnnouncements(res.data); // ✅ FIX
+    setAnnouncements(res.data);
   };
 
   useEffect(() => {
@@ -28,6 +31,7 @@ const Announcements = () => {
   // 🔹 Admin only
   const openModal = () => {
     if (!isAdmin(user)) return;
+    setTitle("");
     setMessage("");
     setModalOpen(true);
   };
@@ -36,14 +40,21 @@ const Announcements = () => {
     setModalOpen(false);
   };
 
+  // 🔹 Create announcement
   const handleCreate = async () => {
     if (!isAdmin(user)) return;
 
-    await createAnnouncement({ message });
+    const payload = {
+      title,
+      message,
+    };
+
+    await createAnnouncement(payload);
     closeModal();
     fetchAnnouncements();
   };
 
+  // 🔹 Delete announcement
   const handleDelete = async (id) => {
     if (!isAdmin(user)) return;
 
@@ -53,7 +64,6 @@ const Announcements = () => {
 
   return (
     <div className="p-6 max-w-4xl mx-auto">
-
       <h2 className="text-2xl font-semibold mb-6">Announcements</h2>
 
       {/* ADMIN ONLY */}
@@ -67,20 +77,20 @@ const Announcements = () => {
       )}
 
       {/* LIST */}
-      <div className="space-y-4">
+      <div className="space-y-5">
         {Array.isArray(announcements) &&
           announcements.map((a) => (
             <div
               key={a.id}
               className="bg-white p-5 rounded-lg shadow border"
             >
-              <p className="text-gray-800">{a.message}</p>
+              <h3 className="text-lg font-semibold">{a.title}</h3>
+              <p className="text-gray-700 mt-1">{a.message}</p>
 
-              {/* ADMIN ONLY */}
               {isAdmin(user) && (
                 <button
                   onClick={() => handleDelete(a.id)}
-                  className="text-red-600 hover:underline text-sm mt-2"
+                  className="text-red-600 hover:underline text-sm mt-3"
                 >
                   Delete
                 </button>
@@ -97,10 +107,17 @@ const Announcements = () => {
               Add Announcement
             </h3>
 
+            <input
+              className="w-full p-3 border rounded mb-3"
+              placeholder="Title"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+            />
+
             <textarea
               className="w-full p-3 border rounded mb-4"
               rows="4"
-              placeholder="Announcement message"
+              placeholder="Message"
               value={message}
               onChange={(e) => setMessage(e.target.value)}
             />

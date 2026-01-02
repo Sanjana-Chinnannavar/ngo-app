@@ -14,11 +14,11 @@ const AssignedEvents = () => {
   const [assignedEvents, setAssignedEvents] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // 🔹 Fetch assigned events (authoritative source)
+  // 🔹 Fetch assigned events (FIX: res.data)
   const fetchAssignedEvents = async () => {
     setLoading(true);
-    const data = await getAssignedEvents();
-    setAssignedEvents(data);
+    const res = await getAssignedEvents();
+    setAssignedEvents(res.data); // ✅ IMPORTANT
     setLoading(false);
   };
 
@@ -26,20 +26,18 @@ const AssignedEvents = () => {
     fetchAssignedEvents();
   }, []);
 
-  // 🔹 Accept (volunteer only)
   const handleAccept = async (eventId) => {
     if (!isVolunteer(user)) return;
 
     await acceptEvent(eventId);
-    fetchAssignedEvents(); // 🔑 re-sync state
+    fetchAssignedEvents();
   };
 
-  // 🔹 Reject (volunteer only)
   const handleReject = async (eventId) => {
     if (!isVolunteer(user)) return;
 
     await rejectEvent(eventId);
-    fetchAssignedEvents(); // 🔑 re-sync state
+    fetchAssignedEvents();
   };
 
   if (loading) {
@@ -47,7 +45,7 @@ const AssignedEvents = () => {
   }
 
   return (
-    <div className="p-6">
+    <div className="p-6 max-w-4xl mx-auto">
       <h2 className="text-2xl font-semibold mb-6">Assigned Events</h2>
 
       {assignedEvents.length === 0 ? (
@@ -62,11 +60,12 @@ const AssignedEvents = () => {
               <h3 className="text-lg font-semibold">{event.title}</h3>
               <p className="text-gray-600">{event.date}</p>
               <p className="text-gray-600">{event.location}</p>
+
               <p className="mt-2 text-sm text-gray-700">
                 Status: <strong>{event.status}</strong>
               </p>
 
-              {/* VOLUNTEER-ONLY WORKFLOW */}
+              {/* VOLUNTEER-ONLY */}
               {isVolunteer(user) && event.status === "PENDING" && (
                 <div className="mt-4 space-x-4">
                   <button
