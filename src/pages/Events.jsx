@@ -132,7 +132,7 @@ const Events = () => {
           <h1 className="text-4xl font-bold text-gray-900 mb-4">
             Events
           </h1>
-          <p className="text-gray-600 mt-2">{isAdmin(user) ? "Manage and explore all events" : "Explore all events"}</p>
+          <p className="text-gray-600 mt-2">Manage and explore all events</p>
         </div>
 
         {isAdmin(user) && (

@@ -277,6 +277,15 @@ const Login = () => {
             </button>
           </div>
 
+          <div className="mt-6 text-center">
+            <a
+              href="#"
+              className="text-sm text-teal-600 hover:text-teal-700 font-semibold hover:underline transition-colors"
+            >
+              Forgot your password?
+            </a>
+          </div>
+
           <p className="text-center text-gray-500 text-xs mt-8">
             By signing in, you agree to our Terms of Service and Privacy Policy
           </p>
