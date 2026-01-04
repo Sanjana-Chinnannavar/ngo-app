@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Calendar, MapPin, CheckCircle, Clock, AlertCircle, Heart } from "lucide-react";
+import { Calendar, MapPin, CheckCircle, Clock, AlertCircle, Heart, X } from "lucide-react";
 const ASSIGNED_EVENTS_URL = "http://localhost:5000/events/assigned";
 import { getAssignedEvents } from "../api/events";
 import { useAuth } from "../context/AuthContext";
@@ -31,7 +31,7 @@ const VolunteerDashboard = () => {
 const handleAccept = async (assignmentId) => {
   try {
     await acceptEvent(token, assignmentId);
-    loadDashboard(); // refresh state
+    loadDashboard();
   } catch (err) {
     console.error("Accept failed", err);
   }
@@ -40,7 +40,7 @@ const handleAccept = async (assignmentId) => {
 const handleReject = async (assignmentId) => {
   try {
     await rejectEvent(token, assignmentId);
-    loadDashboard(); // refresh state
+    loadDashboard();
   } catch (err) {
     console.error("Reject failed", err);
   }
@@ -164,24 +164,28 @@ const handleReject = async (assignmentId) => {
                         <span className="font-medium">{event.location}</span>
                       </div>
                     </div>
-                  </div>
-{event.status === "PENDING" && (
-  <div className="flex gap-3 mt-4">
-    <button
-      onClick={() => handleAccept(event.assignmentId)}
-      className="px-4 py-2 rounded-lg bg-teal-600 text-white font-medium hover:bg-teal-700 transition"
-    >
-      Accept
-    </button>
 
-    <button
-      onClick={() => handleReject(event.assignmentId)}
-      className="px-4 py-2 rounded-lg bg-red-500 text-white font-medium hover:bg-red-600 transition"
-    >
-      Reject
-    </button>
-  </div>
-)}
+                    {event.status === "PENDING" && (
+                      <div className="mt-6 space-y-4 pt-6 border-t border-gray-100">
+                        <div className="flex gap-3">
+                          <button
+                            onClick={() => handleAccept(event.assignmentId)}
+                            className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-teal-500 hover:bg-teal-600 text-white rounded-lg font-semibold transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5"
+                          >
+                            <CheckCircle className="w-4 h-4" />
+                            Accept
+                          </button>
+                          <button
+                            onClick={() => handleReject(event.assignmentId)}
+                            className="flex-1 flex items-center justify-center gap-2 px-4 py-2 border border-red-200 text-red-600 hover:bg-red-50 rounded-lg font-semibold transition-all duration-300 hover:border-red-300"
+                          >
+                            <X className="w-4 h-4" />
+                            Reject
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
 
                   <div className="bg-gradient-to-r from-gray-50 to-white px-6 sm:px-8 py-4 border-t border-gray-100 flex items-center justify-between group-hover:bg-gradient-to-r group-hover:from-teal-50 group-hover:to-gray-50 transition-all duration-300">
                     <span className="text-sm text-gray-600 font-medium">Event ID: {event.id}</span>

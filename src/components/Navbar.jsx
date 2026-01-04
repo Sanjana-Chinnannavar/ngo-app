@@ -1,8 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
-import { Heart, LogOut, Menu, X } from "lucide-react";
+import { Heart, LogOut, Menu, X, User } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import { useState } from "react";
-import { User } from "lucide-react";
 
 const Navbar = () => {
   const { user, logout } = useAuth();
@@ -31,7 +30,6 @@ const Navbar = () => {
     <nav className="sticky top-0 z-50 bg-white border-b border-gray-100 shadow-sm">
       <div className="max-w-7xl mx-auto px-6 py-4">
         <div className="flex justify-between items-center">
-          {/* LEFT: LOGO + TITLE */}
           <div className="flex items-center gap-3 flex-shrink-0">
             <div className="w-10 h-10 bg-gradient-to-br from-teal-500 to-teal-600 rounded-xl flex items-center justify-center shadow-lg">
               <Heart className="w-5 h-5 text-white" />
@@ -44,7 +42,6 @@ const Navbar = () => {
             </div>
           </div>
 
-          {/* CENTER: LINKS (DESKTOP) */}
           <div className="hidden md:flex items-center gap-1">
             {navLinks.map((link) => (
               <Link
@@ -56,16 +53,18 @@ const Navbar = () => {
               </Link>
             ))}
           </div>
-          <Link
-            to="/profile"
-            className="p-2 rounded-lg hover:bg-teal-50 transition"
-  title="Profile"
->
-  <User className="w-5 h-5 text-gray-700" />
-</Link>
 
-          {/* RIGHT: LOGOUT + MOBILE MENU */}
           <div className="flex items-center gap-3">
+            {user.role !== "admin" && (
+              <Link
+                to="/profile"
+                className="hidden sm:flex items-center justify-center w-10 h-10 rounded-lg hover:bg-teal-50 transition-all duration-300 group"
+                title="Profile"
+              >
+                <User className="w-5 h-5 text-gray-700 group-hover:text-teal-600 transition-colors" />
+              </Link>
+            )}
+
             <button
               onClick={handleLogout}
               className="hidden sm:flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-teal-500 to-teal-600 text-white font-medium rounded-lg hover:shadow-lg hover:shadow-teal-200 transition-all duration-300 hover:-translate-y-0.5"
@@ -74,7 +73,6 @@ const Navbar = () => {
               <span className="hidden md:inline">Logout</span>
             </button>
 
-            {/* MOBILE MENU BUTTON */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               className="md:hidden p-2 hover:bg-gray-100 rounded-lg transition-colors"
@@ -88,7 +86,6 @@ const Navbar = () => {
           </div>
         </div>
 
-        {/* MOBILE MENU */}
         {mobileMenuOpen && (
           <div className="md:hidden mt-4 pb-4 border-t border-gray-100 pt-4 animate-in slide-in-from-top-2">
             <div className="space-y-2">
@@ -102,6 +99,16 @@ const Navbar = () => {
                   {link.label}
                 </Link>
               ))}
+              {user.role !== "admin" && (
+                <Link
+                  to="/profile"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center gap-2 px-4 py-3 text-gray-700 font-medium rounded-lg hover:bg-teal-50 hover:text-teal-600 transition-all duration-300"
+                >
+                  <User className="w-4 h-4" />
+                  Profile
+                </Link>
+              )}
               <button
                 onClick={() => {
                   handleLogout();
