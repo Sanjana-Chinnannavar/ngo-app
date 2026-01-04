@@ -79,3 +79,46 @@ export const assignEvent = async (token, eventId, volunteerId) => {
 
   return data;
 };
+export const getAssignedEvents = async (token) => {
+  const res = await fetch("http://localhost:5000/events/assigned", {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message || "Failed to fetch assigned events");
+
+  return data;
+};
+
+// ACCEPT ASSIGNED EVENT (VOLUNTEER)
+export const acceptEvent = async (token, assignmentId) => {
+  const res = await fetch(`${API_URL}/${assignmentId}/accept`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message || "Accept failed");
+
+  return data;
+};
+
+// REJECT ASSIGNED EVENT (VOLUNTEER)
+export const rejectEvent = async (token, assignmentId) => {
+  const res = await fetch(`${API_URL}/${assignmentId}/reject`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message || "Reject failed");
+
+  return data;
+};
+

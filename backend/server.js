@@ -21,6 +21,7 @@ app.use("/auth", authRoutes);
 app.use("/volunteers", volunteerRoutes);
 app.use("/events", eventRoutes);
 app.use("/announcements", announcementRoutes);
+app.use("/volunteers", volunteerRoutes);
 
 // Test route
 app.get("/", (req, res) => {

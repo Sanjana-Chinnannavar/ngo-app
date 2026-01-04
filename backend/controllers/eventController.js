@@ -129,65 +129,8 @@ exports.deleteEvent = asyncHandler(async (req, res) => {
   });
 });
 
-// ACCEPT EVENT
-exports.acceptEvent = asyncHandler(async (req, res) => {
-  const { id } = req.params;
 
-  const event = await Event.findByPk(id);
-
-  if (!event) {
-    return res.status(404).json({
-      success: false,
-      message: "Event not found",
-    });
-  }
-
-  if (event.status !== "upcoming") {
-    return res.status(400).json({
-      success: false,
-      message: "Event already responded to",
-    });
-  }
-
-  event.status = "accepted";
-  await event.save(); //  THIS LINE MAKES IT PERSIST
-
-  res.json({
-    success: true,
-    data: event,
-  });
-});
-
-// REJECT EVENT
-exports.rejectEvent = asyncHandler(async (req, res) => {
-  const { id } = req.params;
-
-  const event = await Event.findByPk(id);
-
-  if (!event) {
-    return res.status(404).json({
-      success: false,
-      message: "Event not found",
-    });
-  }
-
-  if (event.status !== "upcoming") {
-    return res.status(400).json({
-      success: false,
-      message: "Event already responded to",
-    });
-  }
-
-  event.status = "rejected";
-  await event.save(); //  persists to DB
-
-  res.json({
-    success: true,
-    data: event,
-  });
-});
-
-const EventAssignment = require("../models/eventAssignment");
+const EventAssignment = require("../models/EventAssignment");
 const Volunteer = require("../models/Volunteer");
 
 // ASSIGN EVENT TO VOLUNTEER (ADMIN)
@@ -240,3 +183,78 @@ exports.assignEvent = asyncHandler(async (req, res) => {
     data: assignment,
   });
 });
+
+// GET ASSIGNED EVENTS (VOLUNTEER)
+// GET ASSIGNED EVENTS (VOLUNTEER)
+// GET ASSIGNED EVENTS (VOLUNTEER)
+exports.getAssignedEvents = asyncHandler(async (req, res) => {
+  // req.user comes from auth middleware
+  const userId = req.user.id;
+
+  // 1. find volunteer linked to this user
+  const volunteer = await Volunteer.findOne({
+    where: { userId },
+  });
+
+  if (!volunteer) {
+    return res.json({ success: true, data: [] });
+  }
+
+  // 2. find assignments
+  const assignments = await EventAssignment.findAll({
+    where: { volunteerId: volunteer.id },
+  });
+
+  if (assignments.length === 0) {
+    return res.json({ success: true, data: [] });
+  }
+
+  // 3. extract eventIds
+  const eventIds = assignments.map(a => a.eventId);
+
+  // 4. fetch events
+  const events = await Event.findAll({
+    where: { id: eventIds },
+  });
+
+  // 5. attach assignment info
+  const enriched = events.map(event => {
+    const assignment = assignments.find(a => a.eventId === event.id);
+    return {
+      ...event.toJSON(),
+      assignmentId: assignment.id,
+      status: assignment.status,
+    };
+  });
+
+  res.json({ success: true, data: enriched });
+});
+
+
+// ACCEPT EVENT (VOLUNTEER)
+exports.acceptEvent = asyncHandler(async (req, res) => {
+  const assignment = await EventAssignment.findByPk(req.params.id);
+
+  if (!assignment) {
+    return res.status(404).json({ success: false });
+  }
+
+  assignment.status = "ACCEPTED";
+  await assignment.save();
+
+  res.json({ success: true });
+});
+// REJECT EVENT (VOLUNTEER)
+exports.rejectEvent = asyncHandler(async (req, res) => {
+  const assignment = await EventAssignment.findByPk(req.params.id);
+
+  if (!assignment) {
+    return res.status(404).json({ success: false });
+  }
+
+  assignment.status = "REJECTED";
+  await assignment.save();
+
+  res.json({ success: true });
+});
+

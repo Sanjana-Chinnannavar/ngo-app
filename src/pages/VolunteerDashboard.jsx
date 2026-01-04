@@ -1,24 +1,52 @@
 import { useEffect, useState } from "react";
 import { Calendar, MapPin, CheckCircle, Clock, AlertCircle, Heart } from "lucide-react";
-import { getEvents } from "../api/events";
+const ASSIGNED_EVENTS_URL = "http://localhost:5000/events/assigned";
+import { getAssignedEvents } from "../api/events";
 import { useAuth } from "../context/AuthContext";
+import { acceptEvent, rejectEvent } from "../api/events";
 
 const VolunteerDashboard = () => {
-  const { user } = useAuth();
-  const [events, setEvents] = useState([]);
+  const { user, token } = useAuth();
+  const [assignedEvents, setAssignedEvents] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const loadDashboard = async () => {
-    try {
-      setLoading(true);
-      const res = await getEvents();
-      setEvents(res.data.slice(0, 3));
-    } catch (err) {
-      console.error("Failed to load dashboard", err);
-    } finally {
-      setLoading(false);
-    }
-  };
+  try {
+    setLoading(true);
+
+    const res = await fetch(ASSIGNED_EVENTS_URL, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    const data = await res.json();
+    setAssignedEvents(data.data || []);
+  } catch (err) {
+    console.error("Failed to load dashboard", err);
+  } finally {
+    setLoading(false);
+  }
+};
+const handleAccept = async (assignmentId) => {
+  try {
+    await acceptEvent(token, assignmentId);
+    loadDashboard(); // refresh state
+  } catch (err) {
+    console.error("Accept failed", err);
+  }
+};
+
+const handleReject = async (assignmentId) => {
+  try {
+    await rejectEvent(token, assignmentId);
+    loadDashboard(); // refresh state
+  } catch (err) {
+    console.error("Reject failed", err);
+  }
+};
+
+
 
   useEffect(() => {
     loadDashboard();
@@ -79,7 +107,7 @@ const VolunteerDashboard = () => {
         <div className="mb-8">
           <h2 className="text-2xl font-bold text-gray-900 mb-6">Recent Opportunities</h2>
 
-          {events.length === 0 ? (
+          {assignedEvents.length === 0 ? (
             <div className="bg-white rounded-2xl border border-gray-200 p-12 text-center shadow-sm hover:shadow-md transition-shadow duration-300">
               <Heart className="w-16 h-16 text-teal-200 mx-auto mb-4" />
               <p className="text-gray-500 text-lg">No events available at the moment.</p>
@@ -87,7 +115,7 @@ const VolunteerDashboard = () => {
             </div>
           ) : (
             <div className="grid gap-6">
-              {events.map((event, index) => (
+              {assignedEvents.map((event, index) => (
                 <div
                   key={event.id}
                   className="group bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 hover:border-teal-300 hover:-translate-y-1"
@@ -137,6 +165,23 @@ const VolunteerDashboard = () => {
                       </div>
                     </div>
                   </div>
+{event.status === "PENDING" && (
+  <div className="flex gap-3 mt-4">
+    <button
+      onClick={() => handleAccept(event.assignmentId)}
+      className="px-4 py-2 rounded-lg bg-teal-600 text-white font-medium hover:bg-teal-700 transition"
+    >
+      Accept
+    </button>
+
+    <button
+      onClick={() => handleReject(event.assignmentId)}
+      className="px-4 py-2 rounded-lg bg-red-500 text-white font-medium hover:bg-red-600 transition"
+    >
+      Reject
+    </button>
+  </div>
+)}
 
                   <div className="bg-gradient-to-r from-gray-50 to-white px-6 sm:px-8 py-4 border-t border-gray-100 flex items-center justify-between group-hover:bg-gradient-to-r group-hover:from-teal-50 group-hover:to-gray-50 transition-all duration-300">
                     <span className="text-sm text-gray-600 font-medium">Event ID: {event.id}</span>

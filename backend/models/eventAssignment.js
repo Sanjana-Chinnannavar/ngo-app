@@ -31,5 +31,9 @@ const EventAssignment = sequelize.define(
     timestamps: true,
   }
 );
+EventAssignment.associate = (models) => {
+  EventAssignment.belongsTo(models.Event, { foreignKey: "eventId" });
+  EventAssignment.belongsTo(models.Volunteer, { foreignKey: "volunteerId" });
+};
 
 module.exports = EventAssignment;

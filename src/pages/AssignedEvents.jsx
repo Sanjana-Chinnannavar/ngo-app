@@ -10,17 +10,27 @@ import { Calendar, MapPin, Clock, CheckCircle, XCircle, Heart } from "lucide-rea
 const isVolunteer = (user) => user?.role === "volunteer";
 
 const AssignedEvents = () => {
-  const { user } = useAuth();
+  const { user, token } = useAuth();
 
   const [assignedEvents, setAssignedEvents] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const fetchAssignedEvents = async () => {
-    setLoading(true);
-    const res = await getAssignedEvents();
-    setAssignedEvents(res.data);
-    setLoading(false);
-  };
+  setLoading(true);
+
+  const res = await fetch("http://localhost:5000/events/assigned", {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  const data = await res.json();
+  setAssignedEvents(data.data || []);
+  setLoading(false);
+};
+
+
+
 
   useEffect(() => {
     fetchAssignedEvents();
@@ -29,14 +39,14 @@ const AssignedEvents = () => {
   const handleAccept = async (eventId) => {
     if (!isVolunteer(user)) return;
 
-    await acceptEvent(eventId);
+    await acceptEvent(token, assignmentId);
     fetchAssignedEvents();
   };
 
   const handleReject = async (eventId) => {
     if (!isVolunteer(user)) return;
 
-    await rejectEvent(eventId);
+    await rejectEvent(token, assignmentId);
     fetchAssignedEvents();
   };
 
@@ -132,18 +142,18 @@ const AssignedEvents = () => {
                     )}
                   </div>
 
-                  {isVolunteer(user) && event.status?.toLowerCase() === "upcoming" && (
+                  {isVolunteer(user) && event.assignmentStatus === "PENDING" && (
                     <div className="mt-6 pt-6 border-t border-gray-100">
                       <div className="flex gap-3">
                         <button
-                          onClick={() => handleAccept(event.id)}
+                          onClick={() => handleAccept(event.assignmentId)}
                           className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg font-semibold transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5"
                         >
                           <CheckCircle className="w-4 h-4" />
                           Accept
                         </button>
                         <button
-                          onClick={() => handleReject(event.id)}
+                          onClick={() => handleReject(event.assignmentId)}
                           className="flex-1 flex items-center justify-center gap-2 px-4 py-2 border border-red-200 text-red-600 hover:bg-red-50 rounded-lg font-semibold transition-all duration-300 hover:border-red-300"
                         >
                           <XCircle className="w-4 h-4" />

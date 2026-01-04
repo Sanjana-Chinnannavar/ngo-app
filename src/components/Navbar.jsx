@@ -2,6 +2,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { Heart, LogOut, Menu, X } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import { useState } from "react";
+import { User } from "lucide-react";
 
 const Navbar = () => {
   const { user, logout } = useAuth();
@@ -55,6 +56,13 @@ const Navbar = () => {
               </Link>
             ))}
           </div>
+          <Link
+            to="/profile"
+            className="p-2 rounded-lg hover:bg-teal-50 transition"
+  title="Profile"
+>
+  <User className="w-5 h-5 text-gray-700" />
+</Link>
 
           {/* RIGHT: LOGOUT + MOBILE MENU */}
           <div className="flex items-center gap-3">

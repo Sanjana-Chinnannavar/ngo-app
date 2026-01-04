@@ -9,6 +9,7 @@ import Volunteers from "./pages/Volunteers";
 import Events from "./pages/Events";
 import Announcements from "./pages/Announcements";
 import Calendar from "./pages/Calendar";
+import Profile from "./pages/Profile";
 
 const App = () => {
   const location = useLocation();
@@ -39,6 +40,10 @@ const App = () => {
               ? <Navigate to={user.role === "admin" ? "/admin" : "/volunteer"} />
               : <Login />
           }
+        />
+        <Route
+          path="/profile"
+          element={user ? <Profile /> : <Navigate to="/login" />}
         />
 
         {/* ADMIN DASHBOARD */}

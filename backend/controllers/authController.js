@@ -10,7 +10,7 @@ exports.login = asyncHandler(async (req, res) => {
     return res.status(400).json({ success: false, message: "User not found." });
   }
 
-  const isValid = await user.validatePassword(password);
+  const isValid = user.password == password;
   if (!isValid) {
     return res.status(400).json({ success: false, message: "Invalid password." });
   }

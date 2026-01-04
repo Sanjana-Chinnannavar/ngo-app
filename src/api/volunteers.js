@@ -54,3 +54,30 @@ export const deleteVolunteer = async (token, id) => {
 
   if (!res.ok) throw new Error("Failed to delete volunteer");
 };
+export const getMyProfile = async (token) => {
+  const res = await fetch(`${API_URL}/me`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  const data = await res.json();
+  if (!res.ok) throw new Error("Failed to fetch profile");
+
+  return data;
+};
+export const updateMyProfile = async (token, profile) => {
+  const res = await fetch(`${API_URL}/me`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(profile),
+  });
+
+  const data = await res.json();
+  if (!res.ok) throw new Error("Failed to update profile");
+
+  return data;
+};
