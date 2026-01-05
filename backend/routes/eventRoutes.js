@@ -14,6 +14,7 @@ const {
   rejectEvent,
   assignEvent,
   getAssignedEvents,
+  getEventAssignments,
 } = require("../controllers/eventController");
 
 // Public
@@ -25,6 +26,7 @@ router.post("/", auth, admin, addEvent);
 router.put("/:id", auth, admin, updateEvent);
 router.delete("/:id", auth, admin, deleteEvent);
 router.post("/:id/assign", auth, admin, assignEvent);
+router.get("/:id/assignments", auth, admin, getEventAssignments);
 
 
 // Volunteer assigned events

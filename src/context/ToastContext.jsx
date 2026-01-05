@@ -8,7 +8,11 @@ export const ToastProvider = ({ children }) => {
 
     const addToast = useCallback((message, type = "info") => {
         const id = Date.now();
-        setToasts((prev) => [...prev, { id, message, type }]);
+        setToasts((prev) => {
+            // Keep only the last 2 toasts, then add the new one -> Max 3
+            const updated = prev.slice(-2);
+            return [...updated, { id, message, type }];
+        });
 
         // Auto-remove removed as per user request
         // setTimeout(() => {
@@ -27,8 +31,12 @@ export const ToastProvider = ({ children }) => {
         info: (msg) => addToast(msg, "info"),
     };
 
+    const clearToasts = useCallback(() => {
+        setToasts([]);
+    }, []);
+
     return (
-        <ToastContext.Provider value={{ toast, addToast, removeToast }}>
+        <ToastContext.Provider value={{ toast, addToast, removeToast, clearToasts }}>
             {children}
             <ToastContainer toasts={toasts} removeToast={removeToast} />
         </ToastContext.Provider>

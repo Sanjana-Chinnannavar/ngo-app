@@ -12,4 +12,7 @@ Volunteer.belongsToMany(Event, {
   foreignKey: "volunteerId",
 });
 
+EventAssignment.belongsTo(Event, { foreignKey: "eventId" });
+EventAssignment.belongsTo(Volunteer, { foreignKey: "volunteerId" });
+
 module.exports = { Event, Volunteer, EventAssignment };

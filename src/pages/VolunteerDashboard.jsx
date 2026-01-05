@@ -1,50 +1,76 @@
 import { useEffect, useState } from "react";
-import { Calendar, MapPin, CheckCircle, Clock, AlertCircle, Heart, X } from "lucide-react";
+import { Calendar, MapPin, CheckCircle, Clock, AlertCircle, Inbox, X } from "lucide-react";
 const ASSIGNED_EVENTS_URL = "http://localhost:5000/events/assigned";
 import { getAssignedEvents } from "../api/events";
 import { useAuth } from "../context/AuthContext";
 import { acceptEvent, rejectEvent } from "../api/events";
+import { RejectionModal } from "../components/RejectionModal";
+import { useToast } from "../context/ToastContext";
 
 const VolunteerDashboard = () => {
   const { user, token } = useAuth();
+  const { toast } = useToast();
   const [assignedEvents, setAssignedEvents] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  // Rejection Modal State
+  const [isRejectModalOpen, setIsRejectModalOpen] = useState(false);
+  const [selectedEventId, setSelectedEventId] = useState(null);
+  const [rejectLoading, setRejectLoading] = useState(false);
+
   const loadDashboard = async () => {
-  try {
-    setLoading(true);
+    try {
+      setLoading(true);
 
-    const res = await fetch(ASSIGNED_EVENTS_URL, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+      const res = await fetch(ASSIGNED_EVENTS_URL, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
-    const data = await res.json();
-    setAssignedEvents(data.data || []);
-  } catch (err) {
-    console.error("Failed to load dashboard", err);
-  } finally {
-    setLoading(false);
-  }
-};
-const handleAccept = async (assignmentId) => {
-  try {
-    await acceptEvent(token, assignmentId);
-    loadDashboard();
-  } catch (err) {
-    console.error("Accept failed", err);
-  }
-};
+      const data = await res.json();
+      setAssignedEvents(data.data || []);
+    } catch (err) {
+      console.error("Failed to load dashboard", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+  const handleAccept = async (assignmentId) => {
+    try {
+      await acceptEvent(token, assignmentId);
+      toast.success("Event accepted");
+      loadDashboard();
+    } catch (err) {
+      toast.error("Accept failed");
+    }
+  };
 
-const handleReject = async (assignmentId) => {
-  try {
-    await rejectEvent(token, assignmentId);
-    loadDashboard();
-  } catch (err) {
-    console.error("Reject failed", err);
-  }
-};
+  const openRejectModal = (eventId) => {
+    setSelectedEventId(eventId);
+    setIsRejectModalOpen(true);
+  };
+
+  const closeRejectModal = () => {
+    setIsRejectModalOpen(false);
+    setSelectedEventId(null);
+  };
+
+  const handleConfirmReject = async (reason) => {
+    if (!selectedEventId) return;
+    setRejectLoading(true);
+
+    try {
+      await rejectEvent(token, selectedEventId, reason);
+      toast.success("Event rejected");
+      loadDashboard();
+      closeRejectModal();
+    } catch (err) {
+      toast.error("Reject failed");
+    } finally {
+      setRejectLoading(false);
+    }
+  };
 
 
 
@@ -61,7 +87,7 @@ const handleReject = async (assignmentId) => {
       case "cancelled":
         return <AlertCircle className="w-5 h-5 text-red-500" />;
       default:
-        return <Heart className="w-5 h-5 text-teal-500" />;
+        return <Inbox className="w-5 h-5 text-teal-500" />;
     }
   };
 
@@ -109,7 +135,7 @@ const handleReject = async (assignmentId) => {
 
           {assignedEvents.length === 0 ? (
             <div className="bg-white rounded-2xl border border-gray-200 p-12 text-center shadow-sm hover:shadow-md transition-shadow duration-300">
-              <Heart className="w-16 h-16 text-teal-200 mx-auto mb-4" />
+              <Inbox className="w-16 h-16 text-teal-200 mx-auto mb-4" />
               <p className="text-gray-500 text-lg">No events available at the moment.</p>
               <p className="text-gray-400 mt-2">Check back soon for exciting opportunities!</p>
             </div>
@@ -150,7 +176,7 @@ const handleReject = async (assignmentId) => {
                         </div>
                       </div>
                       <div className="hidden sm:flex items-center justify-center w-12 h-12 rounded-xl bg-teal-50 group-hover:bg-teal-100 transition-colors duration-300">
-                        <Heart className="w-6 h-6 text-teal-500" />
+                        <Inbox className="w-6 h-6 text-teal-500" />
                       </div>
                     </div>
 
@@ -176,7 +202,7 @@ const handleReject = async (assignmentId) => {
                             Accept
                           </button>
                           <button
-                            onClick={() => handleReject(event.assignmentId)}
+                            onClick={() => openRejectModal(event.assignmentId)}
                             className="flex-1 flex items-center justify-center gap-2 px-4 py-2 border border-red-200 text-red-600 hover:bg-red-50 rounded-lg font-semibold transition-all duration-300 hover:border-red-300"
                           >
                             <X className="w-4 h-4" />
@@ -197,6 +223,13 @@ const handleReject = async (assignmentId) => {
           )}
         </div>
       </div>
+
+      <RejectionModal
+        isOpen={isRejectModalOpen}
+        onClose={closeRejectModal}
+        onConfirm={handleConfirmReject}
+        loading={rejectLoading}
+      />
     </div>
   );
 };

@@ -5,8 +5,9 @@ import {
   acceptEvent,
   rejectEvent,
 } from "../api/events";
-import { Calendar, MapPin, Clock, CheckCircle, XCircle, Heart } from "lucide-react";
+import { Calendar, MapPin, Clock, CheckCircle, XCircle, Inbox } from "lucide-react";
 import { useToast } from "../context/ToastContext";
+import { RejectionModal } from "../components/RejectionModal";
 
 const isVolunteer = (user) => user?.role === "volunteer";
 
@@ -16,6 +17,11 @@ const AssignedEvents = () => {
 
   const [assignedEvents, setAssignedEvents] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  // Rejection Modal State
+  const [isRejectModalOpen, setIsRejectModalOpen] = useState(false);
+  const [selectedEventId, setSelectedEventId] = useState(null);
+  const [rejectLoading, setRejectLoading] = useState(false);
 
   const fetchAssignedEvents = async () => {
     setLoading(true);
@@ -50,15 +56,29 @@ const AssignedEvents = () => {
     }
   };
 
-  const handleReject = async (eventId) => {
-    if (!isVolunteer(user)) return;
+  const openRejectModal = (eventId) => {
+    setSelectedEventId(eventId);
+    setIsRejectModalOpen(true);
+  };
+
+  const closeRejectModal = () => {
+    setIsRejectModalOpen(false);
+    setSelectedEventId(null);
+  };
+
+  const handleConfirmReject = async (reason) => {
+    if (!selectedEventId) return;
+    setRejectLoading(true);
 
     try {
-      await rejectEvent(token, eventId);
-      toast.success("Event rejected");
+      await rejectEvent(token, selectedEventId, reason);
+      toast.success("Event rejected successfully");
       fetchAssignedEvents();
+      closeRejectModal();
     } catch (err) {
       toast.error(err.message || "Failed to reject event");
+    } finally {
+      setRejectLoading(false);
     }
   };
 
@@ -88,7 +108,7 @@ const AssignedEvents = () => {
         <div className="grid gap-6">
           {assignedEvents.length === 0 ? (
             <div className="bg-white rounded-2xl border border-gray-200 p-12 text-center shadow-sm hover:shadow-md transition-shadow duration-300">
-              <Heart className="w-16 h-16 text-teal-200 mx-auto mb-4" />
+              <Inbox className="w-16 h-16 text-teal-200 mx-auto mb-4" />
               <p className="text-gray-500 text-lg">No assigned events.</p>
               <p className="text-gray-400 mt-2">Events will appear here when assigned to you!</p>
             </div>
@@ -165,7 +185,7 @@ const AssignedEvents = () => {
                           Accept
                         </button>
                         <button
-                          onClick={() => handleReject(event.assignmentId)}
+                          onClick={() => openRejectModal(event.assignmentId)}
                           className="flex-1 flex items-center justify-center gap-2 px-4 py-2 border border-red-200 text-red-600 hover:bg-red-50 rounded-lg font-semibold transition-all duration-300 hover:border-red-300"
                         >
                           <XCircle className="w-4 h-4" />
@@ -184,6 +204,13 @@ const AssignedEvents = () => {
             ))
           )}
         </div>
+
+        <RejectionModal
+          isOpen={isRejectModalOpen}
+          onClose={closeRejectModal}
+          onConfirm={handleConfirmReject}
+          loading={rejectLoading}
+        />
       </div>
     </div>
   );

@@ -1,16 +1,19 @@
 import { Link, useNavigate } from "react-router-dom";
 import { Globe, LogOut, Menu, X, User } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
+import { useToast } from "../context/ToastContext";
 import { useState } from "react";
 
 const Navbar = () => {
   const { user, logout } = useAuth();
+  const { clearToasts } = useToast();
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   if (!user) return null;
 
   const handleLogout = () => {
+    clearToasts();
     logout();
     navigate("/login");
   };

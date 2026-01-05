@@ -191,6 +191,24 @@ exports.assignEvent = asyncHandler(async (req, res) => {
   });
 });
 
+// GET EVENT ASSIGNMENTS (ADMIN)
+exports.getEventAssignments = asyncHandler(async (req, res) => {
+  const eventId = req.params.id;
+
+  const assignments = await EventAssignment.findAll({
+    where: { eventId },
+    include: [{
+      model: Volunteer,
+      attributes: ["id", "name", "email", "phone"]
+    }]
+  });
+
+  res.json({
+    success: true,
+    data: assignments
+  });
+});
+
 // GET ASSIGNED EVENTS (VOLUNTEER)
 // GET ASSIGNED EVENTS (VOLUNTEER)
 // GET ASSIGNED EVENTS (VOLUNTEER)

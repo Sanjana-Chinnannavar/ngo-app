@@ -9,19 +9,19 @@ export const AuthProvider = ({ children }) => {
   );
 
   const login = (token, user) => {
-  setToken(token);
-  setUser(user);
+    setToken(token);
+    setUser(user);
 
-  localStorage.setItem("token", token); // token is STRING
-  localStorage.setItem("user", JSON.stringify(user));
-};
-
+    localStorage.setItem("token", token); // token is STRING
+    localStorage.setItem("user", JSON.stringify(user));
+  };
 
   const logout = () => {
     setToken(null);
     setUser(null);
     localStorage.removeItem("token");
     localStorage.removeItem("user");
+    // TODO: clearToasts(); // Need to verify provider nesting first
   };
 
   return (

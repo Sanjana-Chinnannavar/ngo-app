@@ -6,9 +6,10 @@ import {
   updateEvent,
   deleteEvent,
   assignEvent,
+  getEventAssignments,
 } from "../api/events";
 import { getVolunteers } from "../api/volunteers";
-import { Plus, Calendar, MapPin, Users, Edit2, Trash2, X } from "lucide-react";
+import { Plus, Calendar, MapPin, Users, Edit2, Trash2, X, Eye, AlertCircle, CheckCircle, Clock } from "lucide-react";
 import { useToast } from "../context/ToastContext";
 
 const isAdmin = (user) => user?.role === "admin";
@@ -23,6 +24,11 @@ const Events = () => {
 
   const [modalOpen, setModalOpen] = useState(false);
   const [editingEvent, setEditingEvent] = useState(null);
+
+  // Assignments View State
+  const [assignmentsModalOpen, setAssignmentsModalOpen] = useState(false);
+  const [currentAssignments, setCurrentAssignments] = useState([]);
+  const [viewingEvent, setViewingEvent] = useState(null);
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -125,6 +131,23 @@ const Events = () => {
     } catch (err) {
       toast.error(err.message);
     }
+  };
+
+  const handleViewAssignments = async (event) => {
+    setViewingEvent(event);
+    setAssignmentsModalOpen(true);
+    try {
+      const res = await getEventAssignments(token, event.id);
+      setCurrentAssignments(res.data);
+    } catch (err) {
+      toast.error("Failed to load assignments");
+    }
+  };
+
+  const closeAssignmentsModal = () => {
+    setAssignmentsModalOpen(false);
+    setViewingEvent(null);
+    setCurrentAssignments([]);
   };
 
   return (
@@ -254,6 +277,13 @@ const Events = () => {
                       </div>
 
                       <div className="flex gap-3">
+                        <button
+                          onClick={() => handleViewAssignments(event)}
+                          className="flex-1 flex items-center justify-center gap-2 px-4 py-2 border border-blue-200 text-blue-600 hover:bg-blue-50 rounded-lg font-semibold transition-all duration-300 hover:border-blue-300"
+                        >
+                          <Eye className="w-4 h-4" />
+                          View
+                        </button>
                         <button
                           onClick={() => openModal(event)}
                           className="flex-1 flex items-center justify-center gap-2 px-4 py-2 border border-teal-200 text-teal-600 hover:bg-teal-50 rounded-lg font-semibold transition-all duration-300 hover:border-teal-300"
@@ -400,6 +430,70 @@ const Events = () => {
                   className="flex-1 px-4 py-2 bg-teal-500 hover:bg-teal-600 text-white rounded-lg font-semibold transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5"
                 >
                   {editingEvent ? "Update" : "Create"}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Assignments View Modal */}
+      {isAdmin(user) && assignmentsModalOpen && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-in fade-in duration-200">
+          <div className="bg-white rounded-2xl w-full max-w-2xl shadow-2xl overflow-hidden scale-100 animate-in zoom-in-95 duration-200">
+            <div className="h-1 bg-gradient-to-r from-blue-500 to-teal-400"></div>
+            <div className="p-6 sm:p-8">
+              <div className="flex items-center justify-between mb-6">
+                <div>
+                  <h3 className="text-2xl font-bold text-gray-900">Assignments</h3>
+                  <p className="text-gray-500 text-sm mt-1">For event: <span className="font-semibold text-teal-600">{viewingEvent?.title}</span></p>
+                </div>
+                <button onClick={closeAssignmentsModal} className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+                  <X className="w-5 h-5 text-gray-500" />
+                </button>
+              </div>
+
+              {currentAssignments.length === 0 ? (
+                <div className="text-center py-12 border-2 border-dashed border-gray-100 rounded-xl bg-gray-50">
+                  <Users className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+                  <p className="text-gray-500 font-medium">No volunteers assigned yet.</p>
+                </div>
+              ) : (
+                <div className="space-y-4 max-h-[60vh] overflow-y-auto pr-2">
+                  {currentAssignments.map((assignment) => (
+                    <div key={assignment.id} className="bg-white border border-gray-100 rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow">
+                      <div className="flex items-start justify-between">
+                        <div>
+                          <h4 className="font-bold text-gray-900">{assignment.Volunteer?.name || "Unknown Volunteer"}</h4>
+                          <p className="text-sm text-gray-500">{assignment.Volunteer?.email}</p>
+                        </div>
+                        <div className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 
+                          ${assignment.status === 'ACCEPTED' ? 'bg-green-100 text-green-700' :
+                            assignment.status === 'REJECTED' ? 'bg-red-100 text-red-700' : 'bg-yellow-100 text-yellow-700'}`}>
+                          {assignment.status === 'ACCEPTED' && <CheckCircle className="w-3 h-3" />}
+                          {assignment.status === 'REJECTED' && <AlertCircle className="w-3 h-3" />}
+                          {assignment.status === 'PENDING' && <Clock className="w-3 h-3" />}
+                          {assignment.status}
+                        </div>
+                      </div>
+
+                      {assignment.status === 'REJECTED' && assignment.rejectionReason && (
+                        <div className="mt-4 bg-red-50 border-l-4 border-red-400 p-3 rounded-r-lg">
+                          <p className="text-xs font-bold text-red-800 uppercase mb-1">Rejection Reason</p>
+                          <p className="text-sm text-red-700">{assignment.rejectionReason}</p>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              <div className="mt-8 flex justify-end">
+                <button
+                  onClick={closeAssignmentsModal}
+                  className="px-6 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold rounded-lg transition-colors"
+                >
+                  Close
                 </button>
               </div>
             </div>
