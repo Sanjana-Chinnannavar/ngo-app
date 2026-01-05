@@ -4,9 +4,11 @@ import { getVolunteers } from "../api/volunteers";
 import { getEvents } from "../api/events";
 import { getAnnouncements } from "../api/announcements";
 import { Users, Calendar, Megaphone, MapPin, Clock, Heart } from "lucide-react";
+import { useToast } from "../context/ToastContext";
 
 const AdminDashboard = () => {
   const { token } = useContext(AuthContext);
+  const { toast } = useToast();
 
   const [stats, setStats] = useState({
     volunteers: 0,
@@ -27,7 +29,7 @@ const AdminDashboard = () => {
       try {
         const ann = await getAnnouncements(token);
         announcements = ann.data || [];
-      } catch {}
+      } catch { }
 
       const upcoming = events.filter((e) => e.status === "upcoming");
 
@@ -40,7 +42,7 @@ const AdminDashboard = () => {
       setUpcomingEvents(upcoming);
     } catch (err) {
       console.error(err);
-      alert("Failed to load admin dashboard");
+      toast.error("Failed to load admin dashboard");
     }
 
     setLoading(false);
@@ -99,7 +101,7 @@ const AdminDashboard = () => {
 
           {upcomingEvents.length === 0 ? (
             <div className="bg-white rounded-2xl border border-gray-200 p-12 text-center shadow-sm hover:shadow-md transition-shadow duration-300">
-              <Heart className="w-16 h-16 text-teal-200 mx-auto mb-4" />
+              <Calendar className="w-16 h-16 text-teal-200 mx-auto mb-4" />
               <p className="text-gray-500 text-lg">No upcoming events.</p>
               <p className="text-gray-400 mt-2">Create new events to get started!</p>
             </div>
@@ -140,7 +142,7 @@ const AdminDashboard = () => {
                         </div>
                       </div>
                       <div className="hidden sm:flex items-center justify-center w-12 h-12 rounded-xl bg-teal-50 group-hover:bg-teal-100 transition-colors duration-300">
-                        <Heart className="w-6 h-6 text-teal-500" />
+                        <Calendar className="w-6 h-6 text-teal-500" />
                       </div>
                     </div>
 

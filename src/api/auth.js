@@ -15,3 +15,22 @@ export const loginRequest = async (email, password) => {
 
   return data; // { success, token, user }
 };
+
+export const changePassword = async (token, currentPassword, newPassword) => {
+  const res = await fetch(`${API_URL}/change-password`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ currentPassword, newPassword }),
+  });
+
+  const data = await res.json();
+
+  if (!res.ok) {
+    throw new Error(data.message || "Failed to update password");
+  }
+
+  return data;
+};

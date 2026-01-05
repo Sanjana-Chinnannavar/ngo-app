@@ -9,11 +9,13 @@ import {
 } from "../api/events";
 import { getVolunteers } from "../api/volunteers";
 import { Plus, Calendar, MapPin, Users, Edit2, Trash2, X } from "lucide-react";
+import { useToast } from "../context/ToastContext";
 
 const isAdmin = (user) => user?.role === "admin";
 
 const Events = () => {
   const { user, token } = useAuth();
+  const { toast } = useToast();
 
   const [events, setEvents] = useState([]);
   const [volunteers, setVolunteers] = useState([]);
@@ -113,15 +115,15 @@ const Events = () => {
   const handleAssign = async (eventId) => {
     const volunteerId = selectedVolunteer[eventId];
     if (!volunteerId) {
-      alert("Select a volunteer first");
+      toast.error("Select a volunteer first");
       return;
     }
 
     try {
       await assignEvent(token, eventId, volunteerId);
-      alert("Volunteer assigned");
+      toast.success("Volunteer assigned successfully");
     } catch (err) {
-      alert(err.message);
+      toast.error(err.message);
     }
   };
 

@@ -4,6 +4,7 @@ import moment from "moment";
 import { AuthContext } from "../context/AuthContext";
 import { getEvents } from "../api/events";
 import { Calendar } from "lucide-react";
+import { useToast } from "../context/ToastContext";
 
 import "react-big-calendar/lib/css/react-big-calendar.css";
 
@@ -11,6 +12,7 @@ const localizer = momentLocalizer(moment);
 
 const CalendarPage = () => {
   const { token, user } = useContext(AuthContext);
+  const { toast } = useToast();
   const isAdmin = user?.role === "admin";
 
   const [events, setEvents] = useState([]);
@@ -35,7 +37,7 @@ const CalendarPage = () => {
       setEvents(formatted);
     } catch (err) {
       console.error(err);
-      alert("Failed to load calendar events.");
+      toast.error("Failed to load calendar events.");
     }
     setLoading(false);
   }, [token]);
@@ -66,11 +68,15 @@ const CalendarPage = () => {
   // On event click
   const handleSelectEvent = (event) => {
     if (isAdmin) {
-      alert(` ${event.title}`);
+      toast.info(`Selected: ${event.title}`);
       // later: open edit modal
     } else {
-      alert(
-        `${event.title}\n\n${event.description || ""}\n\n📍 ${event.location}`
+      toast.info(
+        <div>
+          <p className="font-bold">{event.title}</p>
+          <p className="text-sm">{event.description}</p>
+          <p className="text-xs mt-1">📍 {event.location}</p>
+        </div>
       );
     }
   };

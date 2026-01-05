@@ -11,6 +11,8 @@ import Announcements from "./pages/Announcements";
 import Calendar from "./pages/Calendar";
 import Profile from "./pages/Profile";
 
+import { ToastProvider } from "./context/ToastContext";
+
 const App = () => {
   const location = useLocation();
   const { user } = useAuth();
@@ -18,7 +20,7 @@ const App = () => {
   const hideNavbar = location.pathname === "/login";
 
   return (
-    <>
+    <ToastProvider>
       {!hideNavbar && user && <Navbar />}
 
       <Routes>
@@ -98,7 +100,7 @@ const App = () => {
           element={<div style={{ padding: 30 }}>404 Not Found</div>}
         />
       </Routes>
-    </>
+    </ToastProvider>
   );
 };
 

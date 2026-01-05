@@ -36,6 +36,16 @@ const Volunteer = sequelize.define(
       allowNull: true,
       defaultValue: "",
     },
+
+    gender: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+
+    age: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+    },
   },
   {
     tableName: "volunteers",

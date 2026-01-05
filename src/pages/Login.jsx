@@ -2,7 +2,7 @@ import { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import { loginRequest } from "../api/auth";
-import { Shield, Heart, ArrowLeft, Eye, EyeOff } from "lucide-react";
+import { Shield, Heart, ArrowLeft, Eye, EyeOff, Users } from "lucide-react";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -109,7 +109,7 @@ const Login = () => {
                 className="w-full group bg-white border-2 border-teal-600 text-teal-600 py-3 px-6 rounded-xl font-semibold shadow-lg hover:shadow-xl hover:bg-teal-50 transform hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 flex items-center justify-between"
               >
                 <span className="flex items-center gap-3">
-                  <Heart className="w-5 h-5" />
+                  <Users className="w-5 h-5" />
                   Volunteer Portal
                 </span>
                 <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -194,7 +194,7 @@ const Login = () => {
               {role === "admin" ? (
                 <Shield className="w-7 h-7 text-white" />
               ) : (
-                <Heart className="w-7 h-7 text-white" fill="white" />
+                <Users className="w-7 h-7 text-white" />
               )}
             </div>
             <h2 className="text-3xl font-bold text-gray-900 mb-2">

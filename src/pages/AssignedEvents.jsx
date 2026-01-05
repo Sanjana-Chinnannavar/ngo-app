@@ -6,28 +6,30 @@ import {
   rejectEvent,
 } from "../api/events";
 import { Calendar, MapPin, Clock, CheckCircle, XCircle, Heart } from "lucide-react";
+import { useToast } from "../context/ToastContext";
 
 const isVolunteer = (user) => user?.role === "volunteer";
 
 const AssignedEvents = () => {
   const { user, token } = useAuth();
+  const { toast } = useToast();
 
   const [assignedEvents, setAssignedEvents] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const fetchAssignedEvents = async () => {
-  setLoading(true);
+    setLoading(true);
 
-  const res = await fetch("http://localhost:5000/events/assigned", {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
+    const res = await fetch("http://localhost:5000/events/assigned", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
 
-  const data = await res.json();
-  setAssignedEvents(data.data || []);
-  setLoading(false);
-};
+    const data = await res.json();
+    setAssignedEvents(data.data || []);
+    setLoading(false);
+  };
 
 
 
@@ -39,15 +41,25 @@ const AssignedEvents = () => {
   const handleAccept = async (eventId) => {
     if (!isVolunteer(user)) return;
 
-    await acceptEvent(token, assignmentId);
-    fetchAssignedEvents();
+    try {
+      await acceptEvent(token, eventId);
+      toast.success("Event accepted!");
+      fetchAssignedEvents();
+    } catch (err) {
+      toast.error("Failed to accept event");
+    }
   };
 
   const handleReject = async (eventId) => {
     if (!isVolunteer(user)) return;
 
-    await rejectEvent(token, assignmentId);
-    fetchAssignedEvents();
+    try {
+      await rejectEvent(token, eventId);
+      toast.success("Event rejected");
+      fetchAssignedEvents();
+    } catch (err) {
+      toast.error(err.message || "Failed to reject event");
+    }
   };
 
   if (loading) {

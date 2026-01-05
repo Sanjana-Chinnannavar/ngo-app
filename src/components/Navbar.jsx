@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
-import { Heart, LogOut, Menu, X, User } from "lucide-react";
+import { Globe, LogOut, Menu, X, User } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import { useState } from "react";
 
@@ -31,8 +31,9 @@ const Navbar = () => {
       <div className="max-w-7xl mx-auto px-6 py-4">
         <div className="flex justify-between items-center">
           <div className="flex items-center gap-3 flex-shrink-0">
+
             <div className="w-10 h-10 bg-gradient-to-br from-teal-500 to-teal-600 rounded-xl flex items-center justify-center shadow-lg">
-              <Heart className="w-5 h-5 text-white" />
+              <Globe className="w-5 h-5 text-white" />
             </div>
             <div>
               <h1 className="text-xl font-bold text-gray-900">NGO Portal</h1>
@@ -40,7 +41,7 @@ const Navbar = () => {
                 {user.role === "admin" ? "Administrator" : "Volunteer"}
               </p>
             </div>
-          </div>
+          </div >
 
           <div className="hidden md:flex items-center gap-1">
             {navLinks.map((link) => (
@@ -84,7 +85,7 @@ const Navbar = () => {
               )}
             </button>
           </div>
-        </div>
+        </div >
 
         {mobileMenuOpen && (
           <div className="md:hidden mt-4 pb-4 border-t border-gray-100 pt-4 animate-in slide-in-from-top-2">
@@ -122,8 +123,8 @@ const Navbar = () => {
             </div>
           </div>
         )}
-      </div>
-    </nav>
+      </div >
+    </nav >
   );
 };
 

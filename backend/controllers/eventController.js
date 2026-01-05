@@ -166,6 +166,13 @@ exports.assignEvent = asyncHandler(async (req, res) => {
   });
 
   if (existing) {
+    if (existing.status === "REJECTED") {
+      return res.status(400).json({
+        success: false,
+        message: `Volunteer previously rejected this event. Reason: ${existing.rejectionReason || "No reason provided"}`,
+      });
+    }
+
     return res.status(400).json({
       success: false,
       message: "Volunteer already assigned to this event",
@@ -247,12 +254,21 @@ exports.acceptEvent = asyncHandler(async (req, res) => {
 // REJECT EVENT (VOLUNTEER)
 exports.rejectEvent = asyncHandler(async (req, res) => {
   const assignment = await EventAssignment.findByPk(req.params.id);
+  const { reason } = req.body;
 
   if (!assignment) {
     return res.status(404).json({ success: false });
   }
 
+  if (!reason) {
+    return res.status(400).json({
+      success: false,
+      message: "Rejection reason is required"
+    });
+  }
+
   assignment.status = "REJECTED";
+  assignment.rejectionReason = reason;
   await assignment.save();
 
   res.json({ success: true });

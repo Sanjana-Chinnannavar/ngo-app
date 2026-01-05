@@ -25,6 +25,11 @@ const EventAssignment = sequelize.define(
       allowNull: false,
       defaultValue: "PENDING",
     },
+
+    rejectionReason: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
   },
   {
     tableName: "event_assignments",

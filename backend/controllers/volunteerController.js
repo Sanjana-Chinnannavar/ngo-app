@@ -12,7 +12,7 @@ exports.getVolunteers = asyncHandler(async (req, res) => {
 
 // ADD volunteer
 exports.addVolunteer = asyncHandler(async (req, res) => {
-  const { name, email, phone, skills, availability } = req.body;
+  const { name, email, phone, skills, availability, gender, age } = req.body;
 
   if (!name || !email) {
     return res.status(400).json({
@@ -43,7 +43,11 @@ exports.addVolunteer = asyncHandler(async (req, res) => {
     email,
     phone,
     skills,
+    phone,
+    skills,
     availability,
+    gender,
+    age,
     userId: user.id,
   });
 
@@ -148,7 +152,7 @@ exports.updateMyProfile = asyncHandler(async (req, res) => {
 
   // ✅ ONLY allow specific fields
   const updates = {};
-  const allowedFields = ["name", "phone", "skills", "availability"];
+  const allowedFields = ["name", "phone", "skills", "availability", "gender", "age"];
 
   allowedFields.forEach((field) => {
     if (req.body[field] !== undefined) {
