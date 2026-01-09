@@ -33,7 +33,7 @@ exports.addVolunteer = asyncHandler(async (req, res) => {
   // ✅ create user (PLAIN TEXT PASSWORD)
   const user = await User.create({
     email,
-    password: "vol123",
+    password: "password123",
     role: "volunteer",
   });
 
